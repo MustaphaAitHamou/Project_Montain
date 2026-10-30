@@ -1,0 +1,33 @@
+name: Tâches planifiées (sources externes, notifications)
+
+# Alternative gratuite aux tâches planifiées fréquentes de Vercel (plan Pro).
+# Inactif tant que la variable de dépôt CRON_BASE_URL n'est pas définie
+# (Settings → Secrets and variables → Actions → Variables) avec le secret CRON_SECRET.
+# GitHub exécute les workflows planifiés « au mieux » : des retards sont possibles.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  trigger:
+    if: ${{ vars.CRON_BASE_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Synchroniser les sources externes activées
+        run: |
+          curl -fsS --max-time 120 -H "Authorization: Bearer $CRON_SECRET" "$CRON_BASE_URL/api/cron/sources"
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          CRON_BASE_URL: ${{ vars.CRON_BASE_URL }}
+      - name: Traiter l'outbox des notifications
+        if: always()
+        run: |
+          curl -fsS --max-time 120 -H "Authorization: Bearer $CRON_SECRET" "$CRON_BASE_URL/api/cron/notifications"
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          CRON_BASE_URL: ${{ vars.CRON_BASE_URL }}

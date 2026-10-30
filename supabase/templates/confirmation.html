@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+  <body style="font-family: Arial, sans-serif; color: #101820; line-height: 1.5">
+    <h2 style="color: #153d30">Tamurt Alerte</h2>
+    <p>Bonjour,</p>
+    <p>Pour activer votre compte Tamurt Alerte, confirmez votre adresse e-mail :</p>
+    <p>
+      <a
+        href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/"
+        style="
+          background: #153d30;
+          color: #ffffff;
+          padding: 10px 16px;
+          border-radius: 8px;
+          text-decoration: none;
+        "
+        >Confirmer mon adresse</a
+      >
+    </p>
+    <p dir="rtl" lang="ar">
+      لتفعيل حسابكم في تامورت أليرت، يرجى تأكيد بريدكم الإلكتروني عبر الرابط أعلاه.
+    </p>
+    <p style="font-size: 13px; color: #4a5a54">
+      Si vous n'êtes pas à l'origine de cette inscription, ignorez ce message.<br />
+      Tamurt Alerte n'est pas un service officiel de secours.
+    </p>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "name": "tamurt-alerte",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tamurt Alerte — surveillance et information communautaire géolocalisée (Tamurt Services).",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @tamurt/web dev",
+    "dev:mobile": "pnpm --filter @tamurt/mobile start",
+    "build": "pnpm --filter @tamurt/web build",
+    "build:mobile:bundle": "pnpm --filter @tamurt/mobile export:check",
+    "lint": "pnpm -r --no-bail lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --filter '!@tamurt/integration-tests' test",
+    "test:integration": "pnpm --filter @tamurt/integration-tests test",
+    "test:e2e": "pnpm --filter @tamurt/web test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:status": "supabase status",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local --schema public > packages/shared/src/database.types.ts",
+    "geo:build-seed": "node scripts/geo/build-seed.mjs",
+    "demo:seed": "node scripts/demo/seed-demo.mjs",
+    "demo:clear": "node scripts/demo/clear-demo.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "dz-geodata": "0.1.1",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "supabase": "2.122.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  }
+}

@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Format, lint, types, tests unitaires, build web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Build web
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+
+  mobile-bundle:
+    name: Bundle mobile (Metro, Android + iOS)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: quality
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:mobile:bundle
+        env:
+          CI: '1'
+          EXPO_NO_TELEMETRY: '1'
+
+  integration:
+    name: Base de données (migrations, RLS) et tests d'intégration
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: quality
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Démarrer Supabase local
+        run: pnpm exec supabase start -x studio,imgproxy,supavisor,vector,logflare,edge-runtime,postgres-meta
+      - name: Lint SQL (plpgsql_check)
+        run: pnpm exec supabase db lint --level warning --schema public,private
+      - name: Tests d'intégration
+        run: pnpm test:integration
+      - name: Configuration locale du web pour les e2e (instance Supabase éphémère du job)
+        run: |
+          eval "$(pnpm exec supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
+            echo "SUPABASE_SECRET_KEY=$SECRET_KEY"
+            echo "CRON_SECRET=$(openssl rand -hex 24)"
+            echo "REQUIRE_ADMIN_MFA=false"
+            echo "MAILPIT_URL=$MAILPIT_URL"
+          } > apps/web/.env.local
+      - name: Tests end-to-end (Playwright)
+        run: |
+          pnpm --filter @tamurt/web exec playwright install --with-deps chromium
+          pnpm test:e2e
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 7

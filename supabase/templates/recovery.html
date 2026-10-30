@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+  <body style="font-family: Arial, sans-serif; color: #101820; line-height: 1.5">
+    <h2 style="color: #153d30">Tamurt Alerte</h2>
+    <p>Bonjour,</p>
+    <p>Une réinitialisation du mot de passe a été demandée pour votre compte :</p>
+    <p>
+      <a
+        href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reinitialiser-mot-de-passe"
+        style="
+          background: #153d30;
+          color: #ffffff;
+          padding: 10px 16px;
+          border-radius: 8px;
+          text-decoration: none;
+        "
+        >Choisir un nouveau mot de passe</a
+      >
+    </p>
+    <p dir="rtl" lang="ar">
+      طُلبت إعادة تعيين كلمة المرور لحسابكم. استخدموا الرابط أعلاه لاختيار كلمة مرور جديدة.
+    </p>
+    <p style="font-size: 13px; color: #4a5a54">
+      Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre mot de passe reste
+      inchangé.
+    </p>
+  </body>
+</html>

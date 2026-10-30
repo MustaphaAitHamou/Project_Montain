@@ -1,0 +1,15 @@
+node_modules
+pnpm-lock.yaml
+.next
+dist
+build
+coverage
+playwright-report
+test-results
+apps/mobile/.expo
+apps/mobile/ios
+apps/mobile/android
+supabase/.temp
+supabase/seed/*.sql
+packages/shared/src/database.types.ts
+*.geojson

@@ -1,0 +1,48 @@
+# Dépendances
+node_modules/
+.pnpm-store/
+
+# Builds
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Expo / React Native
+.expo/
+apps/mobile/dist/
+apps/mobile/ios/
+apps/mobile/android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Environnement — ne jamais committer de secrets
+.env
+.env.*
+!.env.example
+apps/*/.env.local
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# Divers
+.DS_Store
+*.log
+.vercel/
+.turbo/
+apps/web/public/maplibre/

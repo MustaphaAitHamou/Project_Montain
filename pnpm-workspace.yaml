@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+  - tests/*
+
+# pnpm 10 n'exécute pas les scripts d'installation des dépendances par défaut.
+# Seuls les paquets listés ici sont autorisés (binaires natifs indispensables).
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - supabase
