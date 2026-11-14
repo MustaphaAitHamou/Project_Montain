@@ -239,13 +239,13 @@ export function EventMap({
         id: 'followed-fill',
         type: 'fill',
         source: 'followed',
-        paint: { 'fill-color': '#2D7B57', 'fill-opacity': 0.08 },
+        paint: { 'fill-color': '#1F58B0', 'fill-opacity': 0.08 },
       });
       map.addLayer({
         id: 'followed-line',
         type: 'line',
         source: 'followed',
-        paint: { 'line-color': '#2D7B57', 'line-width': 2, 'line-dasharray': [2, 2] },
+        paint: { 'line-color': '#1F58B0', 'line-width': 2, 'line-dasharray': [2, 2] },
       });
       map.addLayer({
         id: 'earthquakes',

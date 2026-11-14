@@ -12,11 +12,25 @@ export interface ServerEnv {
   vapidSubject: string | null;
   expoAccessToken: string | null;
   requireAdminMfa: boolean;
+  /** Adresse de Tamurt Services (la maison mère) : active le bouton yaz. Vide : pas de bouton. */
+  tamurtServicesUrl: string | null;
 }
 
 function clean(value: string | undefined): string | null {
   const v = value?.trim();
   return v ? v : null;
+}
+
+/** Une adresse http(s) valide, sinon rien : le bouton yaz ne pointe jamais vers un lien mort ou dangereux. */
+function httpUrl(value: string | undefined): string | null {
+  const v = clean(value);
+  if (!v) return null;
+  try {
+    const url = new URL(v);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 export function getServerEnv(): ServerEnv {
@@ -28,6 +42,7 @@ export function getServerEnv(): ServerEnv {
     vapidPrivateKey: clean(process.env.VAPID_PRIVATE_KEY),
     vapidSubject: clean(process.env.VAPID_SUBJECT),
     expoAccessToken: clean(process.env.EXPO_ACCESS_TOKEN),
+    tamurtServicesUrl: httpUrl(process.env.TAMURT_SERVICES_URL),
     // Par défaut le MFA administrateur est exigé en production.
     requireAdminMfa:
       process.env.REQUIRE_ADMIN_MFA === undefined

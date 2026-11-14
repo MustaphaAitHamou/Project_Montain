@@ -1,45 +1,45 @@
 /*
- * Tamurt Alerte — design system web.
+ * Tamurt Alerte — design system web (DA Tamurt Services : rouge signal, blanc et noir).
  * Les valeurs reprennent les jetons de @tamurt/shared/theme (couleurs de marque, gravités).
+ * Le rouge marque la barre d'actions, le bandeau et les boutons, jamais un écran entier.
  * Propriétés logiques (inline/block) partout pour le support RTL (arabe).
  */
 
 :root {
-  --brand-forest: #153d30;
-  --brand-green: #2d7b57;
-  --brand-red: #c62828;
-  --brand-orange: #f59e0b;
-  --brand-blue: #2563eb;
-  --brand-dark: #101820;
+  --brand-red: #d9261c;
+  --brand-red-deep: #8f130b;
+  --brand-black: #111111;
+  --brand-orange: #f8ba3c;
 
-  --sev-information-bg: #2563eb;
+  --sev-information-bg: #1f58b0;
   --sev-information-fg: #ffffff;
-  --sev-vigilance-bg: #f59e0b;
-  --sev-vigilance-fg: #101820;
-  --sev-important-bg: #ea580c;
-  --sev-important-fg: #101820;
-  --sev-critical-bg: #c62828;
+  --sev-vigilance-bg: #f8ba3c;
+  --sev-vigilance-fg: #111111;
+  --sev-important-bg: #b33a08;
+  --sev-important-fg: #ffffff;
+  --sev-critical-bg: #b8261a;
   --sev-critical-fg: #ffffff;
 
-  --color-bg: #f5f7f6;
+  --color-bg: #f6f5f2;
   --color-surface: #ffffff;
-  --color-surface-alt: #eaf1ee;
-  --color-border: #c9d6d0;
-  --color-text: #101820;
-  --color-text-muted: #4a5a54;
-  --color-primary: #153d30;
+  --color-surface-alt: #ebe9e4;
+  --color-border: #dedbd4;
+  --color-text: #1d1b19;
+  --color-text-muted: #5c5852;
+  --color-primary: #d9261c;
   --color-primary-text: #ffffff;
-  --color-accent: #2d7b57;
-  --color-focus: #2563eb;
-  --color-danger: #c62828;
-  --color-warning: #b45309;
-  --color-warning-bg: #fff4e0;
-  --color-info: #2563eb;
-  --color-info-bg: #e8f0ff;
-  --color-danger-bg: #fdecec;
-  --color-success: #1e6b47;
-  --color-success-bg: #e3f4ea;
-  --color-overlay: rgba(16, 24, 32, 0.55);
+  --color-primary-soft: #fde7e4;
+  --color-accent: #c41e14;
+  --color-focus: #1d1b19;
+  --color-danger: #b8261a;
+  --color-warning: #8a5300;
+  --color-warning-bg: #fff3d6;
+  --color-info: #1f58b0;
+  --color-info-bg: #e6eefb;
+  --color-danger-bg: #fde9e7;
+  --color-success: #0b6e5b;
+  --color-success-bg: #e0f4ef;
+  --color-overlay: rgba(29, 27, 25, 0.55);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -48,43 +48,58 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  /* Coins francs, comme un panneau : 2 px partout ; la pilule reste pour les pastilles. */
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
   --radius-pill: 999px;
-  --shadow-1: 0 1px 2px rgba(16, 24, 32, 0.08), 0 1px 3px rgba(16, 24, 32, 0.06);
-  --shadow-2: 0 4px 16px rgba(16, 24, 32, 0.12);
+  /* Pans coupés des boutons et socle noir décalé. */
+  --cut: 12px;
+  --cut-shape: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+  --shadow-1: 0 1px 2px rgba(29, 27, 25, 0.08), 0 1px 3px rgba(29, 27, 25, 0.06);
+  --shadow-2: 0 4px 16px rgba(29, 27, 25, 0.12);
   --touch: 44px;
   --header-h: 60px;
   --bottom-nav-h: 64px;
   --content-max: 1120px;
 
+  /* Inter Tight pour les consignes et le texte ; Anton en capitales pour les titres, niveaux et boutons. */
   --font-sans:
-    var(--font-noto), var(--font-noto-arabic), system-ui, -apple-system, 'Segoe UI', Roboto,
+    var(--font-inter-tight), var(--font-noto-arabic), system-ui, -apple-system, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
+  --font-display:
+    var(--font-anton), var(--font-inter-tight), var(--font-noto-arabic), Impact, sans-serif;
 
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  --color-bg: #101820;
-  --color-surface: #17232d;
-  --color-surface-alt: #1f2f3a;
-  --color-border: #2e4250;
-  --color-text: #f2f5f4;
-  --color-text-muted: #a7b5be;
-  --color-primary: #2d7b57;
+  --color-bg: #141312;
+  --color-surface: #1f1d1b;
+  --color-surface-alt: #2a2724;
+  --color-border: #35322e;
+  --color-text: #f4f1ec;
+  --color-text-muted: #b5afa6;
+  --color-primary: #d9261c;
   --color-primary-text: #ffffff;
-  --color-accent: #56b587;
-  --color-focus: #7fb0ff;
-  --color-danger: #ef5350;
-  --color-warning: #fbbf24;
-  --color-warning-bg: #3a2c10;
-  --color-info: #7fa7ff;
-  --color-info-bg: #18284a;
-  --color-danger-bg: #3d1717;
-  --color-success: #56b587;
-  --color-success-bg: #123526;
+  --color-primary-soft: #3d1210;
+  --color-accent: #ff6b5e;
+  --color-focus: #f4f1ec;
+  --color-danger: #ff8f85;
+  --color-warning: #f8ba3c;
+  --color-warning-bg: #382805;
+  --color-info: #8fb6f5;
+  --color-info-bg: #122444;
+  --color-danger-bg: #3d1512;
+  --color-success: #5fd3bb;
+  --color-success-bg: #0a2a24;
   --color-overlay: rgba(0, 0, 0, 0.6);
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.5);
@@ -93,24 +108,25 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not([data-theme='dark']) {
-    --color-bg: #101820;
-    --color-surface: #17232d;
-    --color-surface-alt: #1f2f3a;
-    --color-border: #2e4250;
-    --color-text: #f2f5f4;
-    --color-text-muted: #a7b5be;
-    --color-primary: #2d7b57;
+    --color-bg: #141312;
+    --color-surface: #1f1d1b;
+    --color-surface-alt: #2a2724;
+    --color-border: #35322e;
+    --color-text: #f4f1ec;
+    --color-text-muted: #b5afa6;
+    --color-primary: #d9261c;
     --color-primary-text: #ffffff;
-    --color-accent: #56b587;
-    --color-focus: #7fb0ff;
-    --color-danger: #ef5350;
-    --color-warning: #fbbf24;
-    --color-warning-bg: #3a2c10;
-    --color-info: #7fa7ff;
-    --color-info-bg: #18284a;
-    --color-danger-bg: #3d1717;
-    --color-success: #56b587;
-    --color-success-bg: #123526;
+    --color-primary-soft: #3d1210;
+    --color-accent: #ff6b5e;
+    --color-focus: #f4f1ec;
+    --color-danger: #ff8f85;
+    --color-warning: #f8ba3c;
+    --color-warning-bg: #382805;
+    --color-info: #8fb6f5;
+    --color-info-bg: #122444;
+    --color-danger-bg: #3d1512;
+    --color-success: #5fd3bb;
+    --color-success-bg: #0a2a24;
     --color-overlay: rgba(0, 0, 0, 0.6);
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.5);
@@ -144,6 +160,15 @@ h2,
 h3 {
   line-height: 1.25;
   margin-block: 0 var(--space-3);
+}
+/* Titres en Anton, capitales : un titre se lit d'un seul regard, comme un panneau. */
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
 }
 h1 {
   font-size: 1.6rem;
@@ -283,8 +308,9 @@ main.page {
   top: 0;
   z-index: 40;
   height: var(--header-h);
-  background: var(--color-primary);
-  color: var(--color-primary-text);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-block-end: 3px solid var(--color-primary);
   box-shadow: var(--shadow-1);
 }
 .site-header .container {
@@ -320,7 +346,11 @@ main.page {
 }
 .top-nav a[aria-current='page'],
 .top-nav a:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--color-surface-alt);
+}
+.top-nav a[aria-current='page'] {
+  color: var(--color-accent);
+  font-weight: 700;
 }
 .header-actions {
   margin-inline-start: auto;
@@ -405,6 +435,7 @@ main.page {
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-block-start: 5px solid var(--color-primary);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   box-shadow: var(--shadow-1);
@@ -423,6 +454,9 @@ main.page {
 }
 
 .btn {
+  --btn-bg: var(--color-surface-alt);
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -432,11 +466,24 @@ main.page {
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   font: inherit;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
-  background: var(--color-surface-alt);
+  background: transparent;
   color: var(--color-text);
+}
+/* Le fond vit dans ::before : il prend les pans coupés sans rogner l'anneau de focus. */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: var(--btn-bg);
+  clip-path: var(--cut-shape);
 }
 .btn:disabled,
 .btn[aria-disabled='true'] {
@@ -444,29 +491,78 @@ main.page {
   cursor: not-allowed;
 }
 .btn-primary {
-  background: var(--color-primary);
+  --btn-bg: var(--color-primary);
   color: var(--color-primary-text);
 }
+.btn-primary:hover {
+  --btn-bg: #c41e14;
+}
+/* Socle noir décalé : l'épaisseur d'un panneau. */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -2;
+  background: var(--brand-black);
+  clip-path: var(--cut-shape);
+  transform: translate(3px, 3px);
+}
 .btn-danger {
-  background: var(--brand-red);
+  --btn-bg: var(--color-danger);
   color: #fff;
 }
+:root[data-theme='dark'] .btn-danger {
+  color: #3d1512;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) .btn-danger {
+    color: #3d1512;
+  }
+}
 .btn-outline {
-  background: transparent;
+  --btn-bg: transparent;
   border-color: var(--color-border);
   color: var(--color-text);
 }
 .btn-ghost {
-  background: transparent;
+  --btn-bg: transparent;
   color: inherit;
+}
+.btn-outline::before,
+.btn-ghost::before {
+  clip-path: none;
+}
+/* Sur le bandeau rouge : aplat blanc, texte rouge profond, socle noir (l'action principale). */
+.btn-inverse {
+  --btn-bg: #ffffff;
+  color: var(--brand-red-deep);
+}
+.btn-inverse::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -2;
+  background: var(--brand-black);
+  clip-path: var(--cut-shape);
+  transform: translate(3px, 3px);
+}
+/* Sur le bandeau rouge : action secondaire au trait blanc. */
+.btn-on-brand {
+  --btn-bg: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+.btn-on-brand::before {
+  clip-path: none;
 }
 .btn-block {
   width: 100%;
 }
 .btn-sm {
+  --cut: 8px;
   min-height: 36px;
   padding: var(--space-1) var(--space-3);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
 }
 .icon-btn {
   min-width: var(--touch);
@@ -666,13 +762,13 @@ fieldset {
 }
 
 .hero {
-  background: linear-gradient(135deg, var(--brand-forest), #1f5a45);
+  background: linear-gradient(57deg, var(--brand-red-deep), var(--brand-red));
   color: #fff;
   border-radius: var(--radius-lg);
   padding: var(--space-5);
 }
 .hero p {
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
 }
 
 .kbd-hint {
@@ -751,7 +847,7 @@ fieldset {
   font-size: 0.9rem;
 }
 .map-popup a {
-  color: #153d30;
+  color: #c41e14;
   font-weight: 700;
 }
 .legend-dot,
@@ -899,4 +995,54 @@ fieldset {
 }
 .inline-form .field {
   min-width: 140px;
+}
+
+/* ---------- Frise ---------- */
+/* Rubalise rouge et blanche : on comprend « attention » avant de lire. Décorative ; ne remplace jamais un niveau. */
+.frise {
+  height: 12px;
+  background: repeating-linear-gradient(-56deg, var(--brand-red) 0 9px, #ffffff 9px 18px);
+}
+
+/* ---------- Logo et bouton yaz ---------- */
+/* Le logo existe en deux versions : celle du thème actif est affichée. */
+.brand img {
+  display: block;
+  height: 30px;
+  width: auto;
+}
+.brand .logo-sombre {
+  display: none;
+}
+:root[data-theme='dark'] .brand .logo-clair {
+  display: none;
+}
+:root[data-theme='dark'] .brand .logo-sombre {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) .brand .logo-clair {
+    display: none;
+  }
+  :root:not([data-theme='light']):not([data-theme='dark']) .brand .logo-sombre {
+    display: block;
+  }
+}
+/* Le bouton yaz : la porte vers toute la famille Tamurt, toujours rouge, toujours en bout d'en-tête. */
+.tamurt-yaz {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+.tamurt-yaz img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  transition: transform 0.2s ease;
+}
+.tamurt-yaz:hover img {
+  transform: scale(1.08);
 }

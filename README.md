@@ -9,6 +9,17 @@ notifications ciblées, sources externes (séismes, points chauds satellites, m�
 > ⚠️ Tamurt Alerte **n'est pas un service officiel de secours** et ne garantit pas une alerte
 > immédiate. En cas de danger, suivez les consignes des autorités et des services de secours.
 
+## Identité visuelle
+
+Tamurt Alerte suit la DA de la famille **Tamurt Services**. Elle est « bien rouge » : rouge signal `#D9261C`, blanc et noir, sur les neutres chauds communs à la famille.
+
+- **Rouge** : il marque la barre, le bandeau d'accueil, les actions et la tête des cartes, jamais un écran entier.
+- **Niveaux de gravité** : information (bleu), vigilance (ambre), important (orange) et critique (rouge danger). Le rouge danger est réservé au dernier niveau ; chaque niveau garde son libellé et son icône.
+- **Polices** : Anton en capitales pour les titres et les boutons, Inter Tight pour les consignes et le texte. Noto Sans Arabic couvre l'arabe.
+- **Formes** : coins francs de 2 px ; boutons à pans coupés avec un socle noir décalé, comme un panneau ; rubalise rouge et blanche sous le bandeau d'accueil.
+- **Fichiers** : jetons dans `packages/shared/src/theme` (web et mobile) et `apps/web/app/globals.css` ; logos dans `apps/web/public/brand`.
+- **Bouton yaz** : il apparaît en bout d'en-tête quand `TAMURT_SERVICES_URL` est renseignée.
+
 ## Structure
 
 | Dossier           | Contenu                                                                  |

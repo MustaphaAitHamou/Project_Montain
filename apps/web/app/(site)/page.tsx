@@ -57,15 +57,17 @@ export default async function HomePage() {
             : t('common.lastUpdate', { time: formatDateTime(fetchedAt, locale) })}
         </p>
         <div className="row">
-          <Link href="/signaler" className="btn btn-danger">
+          <Link href="/signaler" className="btn btn-inverse">
             <Megaphone size={18} aria-hidden="true" />
             {t('home.reportCta')}
           </Link>
-          <Link href="/carte" className="btn" style={{ background: '#fff', color: '#153D30' }}>
+          <Link href="/carte" className="btn btn-on-brand">
             {t('home.openMap')}
           </Link>
         </div>
       </section>
+      {/* Rubalise rouge et blanche sous le bandeau d'accueil (décorative, une par écran). */}
+      <div className="frise" aria-hidden="true" />
 
       <div className="banner banner-info" role="note">
         <p className="small">

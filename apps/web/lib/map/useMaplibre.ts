@@ -51,7 +51,7 @@ function addBoundaries(map: MaplibreMap, visible: boolean) {
         type: 'line',
         source: 'communes',
         paint: {
-          'line-color': dark ? '#56B587' : '#2D7B57',
+          'line-color': dark ? '#B5AFA6' : '#5C5852',
           'line-width': 0.8,
           'line-opacity': 0.7,
         },

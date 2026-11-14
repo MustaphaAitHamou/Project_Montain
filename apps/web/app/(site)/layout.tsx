@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Bell, LogIn, UserRound } from 'lucide-react';
-import { LogoMark } from '@/components/brand/Logo';
+import { Logo } from '@/components/brand/Logo';
+import { TamurtYaz } from '@/components/brand/TamurtYaz';
 import { BottomNav, TopNav, type NavItem } from '@/components/layout/NavLinks';
 import { ConnectivityBanner } from '@/components/layout/ConnectivityBanner';
 import { OfflineSync } from '@/components/layout/OfflineSync';
@@ -41,9 +42,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </a>
       <header className="site-header">
         <div className="container">
-          <Link href="/" className="brand">
-            <LogoMark size={34} />
-            <span>{t('app.name')}</span>
+          <Link href="/" className="brand" aria-label={t('app.name')}>
+            <Logo label={t('app.name')} />
           </Link>
           <TopNav items={items} label={t('nav.mainNavigation')} />
           <div className="header-actions">
@@ -81,15 +81,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
                 </Link>
               </>
             ) : (
-              <Link
-                href="/connexion"
-                className="btn btn-sm"
-                style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }}
-              >
+              <Link href="/connexion" className="btn btn-primary btn-sm">
                 <LogIn size={18} aria-hidden="true" />
                 {t('common.signIn')}
               </Link>
             )}
+            <TamurtYaz />
           </div>
         </div>
       </header>

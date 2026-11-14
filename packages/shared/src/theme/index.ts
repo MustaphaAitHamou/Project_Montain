@@ -1,15 +1,18 @@
 import type { Severity } from '../domain/severity';
 import type { DisplayClass } from '../domain/sources';
 
-/** Palette de marque Tamurt Alerte. */
+/**
+ * Palette de marque Tamurt Alerte (DA Tamurt Services) : rouge signal, blanc et noir.
+ * Le rouge marque la barre, le bandeau et les actions, jamais un écran entier.
+ */
 export const brand = {
-  forest: '#153D30',
-  green: '#2D7B57',
-  alertRed: '#C62828',
-  vigilanceOrange: '#F59E0B',
-  infoBlue: '#2563EB',
+  signalRed: '#D9261C',
+  signalRedDeep: '#8F130B',
+  signalRedVif: '#F03A2A',
+  black: '#111111',
   white: '#FFFFFF',
-  darkBg: '#101820',
+  ink: '#1D1B19',
+  darkBg: '#141312',
 } as const;
 
 export interface ThemeColors {
@@ -30,51 +33,54 @@ export interface ThemeColors {
   overlay: string;
 }
 
+/** Neutres chauds communs à la famille Tamurt ; rouge signal pour les actions ; statuts de la DA. */
 export const lightColors: ThemeColors = {
-  background: '#F5F7F6',
+  background: '#F6F5F2',
   surface: '#FFFFFF',
-  surfaceAlt: '#EAF1EE',
-  border: '#C9D6D0',
-  text: '#101820',
-  textMuted: '#4A5A54',
-  primary: brand.forest,
+  surfaceAlt: '#EBE9E4',
+  border: '#DEDBD4',
+  text: brand.ink,
+  textMuted: '#5C5852',
+  primary: brand.signalRed,
   primaryText: '#FFFFFF',
-  accent: brand.green,
-  focus: '#2563EB',
-  danger: brand.alertRed,
-  warning: '#B45309',
-  info: brand.infoBlue,
-  success: '#1E6B47',
-  overlay: 'rgba(16, 24, 32, 0.55)',
+  accent: '#C41E14',
+  focus: brand.ink,
+  danger: '#B8261A',
+  warning: '#8A5300',
+  info: '#1F58B0',
+  success: '#0B6E5B',
+  overlay: 'rgba(29, 27, 25, 0.55)',
 };
 
 export const darkColors: ThemeColors = {
   background: brand.darkBg,
-  surface: '#17232D',
-  surfaceAlt: '#1F2F3A',
-  border: '#2E4250',
-  text: '#F2F5F4',
-  textMuted: '#A7B5BE',
-  primary: brand.green,
+  surface: '#1F1D1B',
+  surfaceAlt: '#2A2724',
+  border: '#35322E',
+  text: '#F4F1EC',
+  textMuted: '#B5AFA6',
+  primary: brand.signalRed,
   primaryText: '#FFFFFF',
-  accent: '#56B587',
-  focus: '#7FB0FF',
-  danger: '#EF5350',
-  warning: '#FBBF24',
-  info: '#7FA7FF',
-  success: '#56B587',
+  accent: '#FF6B5E',
+  focus: '#F4F1EC',
+  danger: '#FF8F85',
+  warning: '#F8BA3C',
+  info: '#8FB6F5',
+  success: '#5FD3BB',
   overlay: 'rgba(0, 0, 0, 0.6)',
 };
 
 /**
  * Couleurs de gravité : fond + texte avec un contraste ≥ 4,5:1 (vérifié par test).
+ * Mêmes niveaux que la DA Tamurt Services : information (bleu), vigilance (ambre),
+ * important (orange du niveau « alerte »), critique (rouge danger, réservé au dernier niveau).
  * La couleur n'est jamais le seul indicateur : un libellé et une icône l'accompagnent.
  */
 export const severityColors: Record<Severity, { background: string; text: string }> = {
-  information: { background: brand.infoBlue, text: '#FFFFFF' },
-  vigilance: { background: brand.vigilanceOrange, text: brand.darkBg },
-  important: { background: '#EA580C', text: brand.darkBg },
-  critical: { background: brand.alertRed, text: '#FFFFFF' },
+  information: { background: '#1F58B0', text: '#FFFFFF' },
+  vigilance: { background: '#F8BA3C', text: brand.black },
+  important: { background: '#B33A08', text: '#FFFFFF' },
+  critical: { background: '#B8261A', text: '#FFFFFF' },
 };
 
 /** Style de marqueur cartographique selon la provenance / le niveau de vérification. */
@@ -90,7 +96,8 @@ export const displayClassStyles: Record<
 };
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
-export const radii = { sm: 6, md: 10, lg: 16, pill: 999 } as const;
+/** Coins francs de la DA Alerte (panneaux) : 2 px partout, pilule réservée aux pastilles. */
+export const radii = { sm: 2, md: 2, lg: 2, pill: 999 } as const;
 export const fontSizes = { xs: 12, sm: 14, md: 16, lg: 18, xl: 22, xxl: 28 } as const;
 /** Taille minimale des cibles tactiles (WCAG 2.5.5 / recommandations iOS et Android). */
 export const minTouchTarget = 44;

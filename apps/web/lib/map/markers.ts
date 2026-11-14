@@ -47,7 +47,7 @@ function clusterSvg(count: string): string {
   const width = count.length > 2 ? 52 : 44;
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width * 2}" height="88" viewBox="0 0 ${width} 44">` +
-    `<rect x="2" y="2" width="${width - 4}" height="40" rx="20" fill="#153D30" stroke="#FFFFFF" stroke-width="3"/>` +
+    `<rect x="2" y="2" width="${width - 4}" height="40" rx="20" fill="#111111" stroke="#FFFFFF" stroke-width="3"/>` +
     `<text x="${width / 2}" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">${count}</text>` +
     `</svg>`
   );

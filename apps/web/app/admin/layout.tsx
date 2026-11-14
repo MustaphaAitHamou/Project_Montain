@@ -63,11 +63,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span>{t('admin.title')}</span>
           </Link>
           <div className="header-actions">
-            <Link
-              href="/"
-              className="btn btn-sm"
-              style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }}
-            >
+            <Link href="/" className="btn btn-outline btn-sm">
               {t('nav.home')}
             </Link>
           </div>
