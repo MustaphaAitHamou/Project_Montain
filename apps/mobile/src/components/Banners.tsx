@@ -18,7 +18,7 @@ function Notice({
   children: React.ReactNode;
 }) {
   const { colors } = useTheme();
-  const border = { info: colors.info, warning: '#F59E0B', danger: colors.danger }[tone];
+  const border = { info: colors.info, warning: '#F8BA3C', danger: colors.danger }[tone];
   return (
     <View
       accessibilityRole={tone === 'info' ? 'text' : 'alert'}

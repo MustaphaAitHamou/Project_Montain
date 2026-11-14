@@ -20,12 +20,12 @@ export async function ensureChannels(): Promise<void> {
   await Notifications.setNotificationChannelAsync('alerts', {
     name: 'Alertes',
     importance: AndroidImportance.HIGH,
-    lightColor: '#2D7B57',
+    lightColor: '#D9261C',
   });
   await Notifications.setNotificationChannelAsync('alerts-critical', {
     name: 'Alertes critiques',
     importance: AndroidImportance.MAX,
-    lightColor: '#C62828',
+    lightColor: '#B8261A',
     vibrationPattern: [0, 400, 200, 400],
   });
 }

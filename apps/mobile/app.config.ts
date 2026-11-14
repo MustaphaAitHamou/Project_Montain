@@ -12,6 +12,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'tamurtalerte',
   version: '0.1.0',
   orientation: 'portrait',
+  // Icônes de la DA Tamurt Services (kit) : le yaz en vol et le point d'exclamation sur le rouge signal.
+  icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   ios: {
     bundleIdentifier: 'com.tamurtservices.alerte',
@@ -30,7 +32,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Permissions minimales : pas de localisation en arrière-plan.
     permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION', 'POST_NOTIFICATIONS'],
     blockedPermissions: ['android.permission.ACCESS_BACKGROUND_LOCATION'],
-    adaptiveIcon: { backgroundColor: '#153D30' },
+    adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#D9261C' },
   },
   plugins: [
     'expo-router',
@@ -44,7 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         isIosBackgroundLocationEnabled: false,
       },
     ],
-    ['expo-notifications', { color: '#153D30' }],
+    ['expo-notifications', { color: '#D9261C' }],
     [
       'expo-image-picker',
       {

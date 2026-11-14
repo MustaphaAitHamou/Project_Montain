@@ -66,7 +66,7 @@ export function StatusBadge({ status }: { status: VerificationStatus }) {
       label={tk(`status.${status}`)}
       background={colors.surfaceAlt}
       color={colors.text}
-      borderColor={unverified ? '#F59E0B' : colors.border}
+      borderColor={unverified ? '#F8BA3C' : colors.border}
       dashed={unverified}
       Icon={unverified ? CircleDashed : CircleCheck}
     />

@@ -40,7 +40,7 @@ Vitest, Playwright, Supabase local (Postgres 17 + PostGIS), CI.
 - **Web, appliqué.** Rouge signal, blanc et noir. Polices Anton et Inter Tight, boutons à pans coupés avec socle noir, cartes à bande rouge. Rubalise sous l'accueil, logos, icônes et manifeste, bouton yaz.
 - **Vérifié** : typecheck, lint, Prettier, tests (shared 59, mobile 8, server 22, web 3), build. Axe WCAG A/AA sur 5 pages publiques, en clair et en sombre : 0 violation critique ou sérieuse.
 - **Non relancés** : les E2E (`apps/web/e2e`). Ils exigent la pile Supabase locale, indisponible dans l'environnement de travail.
-- **Mobile, en partie.** Les couleurs et les coins viennent du thème partagé. Les polices Anton et Inter Tight ne sont pas encore chargées dans l'app Expo, et le rendu n'a pas été contrôlé sur appareil.
+- **Mobile, en partie.** Les couleurs et les coins viennent du thème partagé. L'icône et l'icône adaptative Android viennent du kit, et les couleurs restantes (carte, notifications) sont alignées. Les polices Anton et Inter Tight ne sont pas encore chargées dans l'app Expo, et le rendu n'a pas été contrôlé sur appareil.
 - **Slogan** : « Veillons ensemble sur notre terre » est conservé.
 
 ## Phase 2 — Backend ✅

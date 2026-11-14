@@ -75,7 +75,7 @@ export function Banner({
   const { colors } = useTheme();
   const border = {
     info: colors.info,
-    warning: '#F59E0B',
+    warning: '#F8BA3C',
     danger: colors.danger,
     success: colors.success,
   }[tone];

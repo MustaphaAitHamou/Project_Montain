@@ -71,14 +71,14 @@ export default function LocationPickerNative({
             id="pick-area"
             type="fill"
             filter={['==', ['get', 'kind'], 'area']}
-            paint={{ 'fill-color': '#C62828', 'fill-opacity': 0.15 }}
+            paint={{ 'fill-color': '#D9261C', 'fill-opacity': 0.15 }}
           />
           <Layer
             id="pick-point"
             type="circle"
             filter={['==', ['get', 'kind'], 'point']}
             paint={{
-              'circle-color': '#C62828',
+              'circle-color': '#D9261C',
               'circle-radius': 9,
               'circle-stroke-color': colors.surface,
               'circle-stroke-width': 3,

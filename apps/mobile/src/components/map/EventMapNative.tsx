@@ -181,7 +181,7 @@ export default function EventMapNative({
             type="circle"
             filter={isCluster}
             paint={{
-              'circle-color': '#153D30',
+              'circle-color': '#111111',
               'circle-radius': clusterRadius,
               'circle-stroke-color': '#FFFFFF',
               'circle-stroke-width': 2,
