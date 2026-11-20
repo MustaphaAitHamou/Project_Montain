@@ -786,6 +786,9 @@ isOneToOne: false
               "code": string,"lat": number,"lng": number,"name_fr": string,"population": number,"wilaya_code": string
             }[]
                            },
+"coverage_distance_km":
+{ Args: { "p_lat": number,"p_lng": number }; Returns: number
+                           },
 "create_abuse_report":
 { Args: { "p_details"?: string,"p_reason": string,"p_target_id": string,"p_target_type": string }; Returns: undefined
                            },
@@ -946,6 +949,14 @@ isOneToOne: false
                            },
 "update_report_description":
 { Args: { "p_description": string,"p_report_id": string }; Returns: undefined
+                           },
+"wilaya_boundaries_geojson":
+{ Args: { "p_tolerance"?: number }; Returns: Json
+                           },
+"wilaya_forecast_points":
+{ Args: { "p_per_wilaya"?: number }; Returns: {
+              "code": string,"lat": number,"lng": number,"name_fr": string,"population": number,"wilaya_code": string
+            }[]
                            },
 "withdraw_report":
 { Args: { "p_report_id": string }; Returns: undefined

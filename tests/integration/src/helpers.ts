@@ -82,8 +82,12 @@ export async function deleteCreatedUsers(): Promise<void> {
 
 /** Point situé dans la commune de Tizi Ouzou (1501). */
 export const TIZI_OUZOU = { lat: 36.7118, lng: 4.0459 };
-/** Point situé à Alger, hors du référentiel couvert. */
+/** Point situé à Alger (commune couverte depuis l'extension nationale). */
 export const ALGER = { lat: 36.7538, lng: 3.0588 };
+/** Point situé à Tamanrasset (1101), dans le Grand Sud. */
+export const TAMANRASSET = { lat: 22.785, lng: 5.5228 };
+/** Point situé à Tunis (Tunisie), hors du territoire couvert. */
+export const TUNIS = { lat: 36.8065, lng: 10.1815 };
 
 export function reportParams(overrides: Record<string, unknown> = {}) {
   return {

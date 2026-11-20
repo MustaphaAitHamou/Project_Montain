@@ -6,12 +6,29 @@ import { getI18n } from '@/lib/i18n';
 import { getSession } from '@/lib/auth';
 import { listActiveEvents } from '@/lib/data/events';
 import { EventMap } from '@/components/map/EventMap';
+import { FollowVillagesSpot } from '@/components/illustrations/AlertScenes';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
   return { title: t('villages.title') };
+}
+
+/** Emprise couvrant les zones suivies (centre ± rayon), pour cadrer la carte sur elles. */
+function boundsAround(
+  places: { lat: number; lng: number; radius_m: number }[],
+): [number, number, number, number] {
+  const box: [number, number, number, number] = [180, 90, -180, -90];
+  for (const p of places) {
+    const dLat = p.radius_m / 111_320;
+    const dLng = p.radius_m / (111_320 * Math.cos((p.lat * Math.PI) / 180));
+    box[0] = Math.min(box[0], p.lng - dLng);
+    box[1] = Math.min(box[1], p.lat - dLat);
+    box[2] = Math.max(box[2], p.lng + dLng);
+    box[3] = Math.max(box[3], p.lat + dLat);
+  }
+  return box;
 }
 
 export default async function VillagesPage() {
@@ -23,15 +40,18 @@ export default async function VillagesPage() {
       <main className="page container stack" id="contenu">
         <h1>{t('villages.title')}</h1>
         <p>{t('villages.intro')}</p>
-        <div className="card stack-sm">
-          <p>{t('villages.signInToSync')}</p>
-          <div className="row">
-            <Link href="/connexion?next=/villages" className="btn btn-primary">
-              {t('common.signIn')}
-            </Link>
-            <Link href="/inscription" className="btn btn-outline">
-              {t('common.signUp')}
-            </Link>
+        <div className="card spot-row">
+          <FollowVillagesSpot />
+          <div className="stack-sm">
+            <p style={{ margin: 0 }}>{t('villages.signInToSync')}</p>
+            <div className="row">
+              <Link href="/connexion?next=/villages" className="btn btn-primary">
+                {t('common.signIn')}
+              </Link>
+              <Link href="/inscription" className="btn btn-outline">
+                {t('common.signUp')}
+              </Link>
+            </div>
           </div>
         </div>
       </main>
@@ -56,6 +76,7 @@ export default async function VillagesPage() {
 
       {places.length === 0 ? (
         <div className="card empty-state">
+          <FollowVillagesSpot className="empty-illustration empty-illustration-sm" />
           <p>{t('villages.empty')}</p>
           <Link href="/villages/ajouter" className="btn btn-primary">
             {t('home.followedEmptyCta')}
@@ -75,6 +96,7 @@ export default async function VillagesPage() {
               lng: p.lng,
               radiusM: p.radius_m,
             }))}
+            initialBounds={boundsAround(places)}
           />
           <ul className="list-plain grid-2">
             {places.map((p) => (

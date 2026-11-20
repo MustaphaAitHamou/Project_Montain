@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { assessFreshness } from './format/freshness';
 import { coarsenLocation, formatDistance, haversineMeters, isWithinBBox } from './geo';
-import { KABYLIE_REGION } from './config';
+import { DEFAULT_REGION, KABYLIE_REGION } from './config';
 import { contrastRatio, severityColors, lightColors, darkColors } from './theme';
 import { SEVERITIES } from './domain/severity';
 import { CATEGORIES } from './domain/categories';
@@ -13,9 +13,19 @@ describe('géographie', () => {
     expect(d).toBeGreaterThan(89000);
     expect(d).toBeLessThan(92000);
   });
-  it("vérifie l'appartenance à l'emprise de la Kabylie", () => {
+  it("vérifie l'appartenance à l'emprise de la zone de lancement (Kabylie)", () => {
     expect(isWithinBBox({ lat: 36.7118, lng: 4.0459 }, KABYLIE_REGION.bbox)).toBe(true);
     expect(isWithinBBox({ lat: 36.7538, lng: 3.0588 }, KABYLIE_REGION.bbox)).toBe(false); // Alger
+  });
+  it("couvre toute l'Algérie, du littoral au Grand Sud", () => {
+    expect(DEFAULT_REGION.id).toBe('algerie');
+    expect(DEFAULT_REGION.wilayaCodes).toHaveLength(69);
+    expect(DEFAULT_REGION.wilayaCodes[0]).toBe('01');
+    expect(DEFAULT_REGION.wilayaCodes.at(-1)).toBe('69');
+    expect(isWithinBBox({ lat: 36.7538, lng: 3.0588 }, DEFAULT_REGION.bbox)).toBe(true); // Alger
+    expect(isWithinBBox({ lat: 22.785, lng: 5.5228 }, DEFAULT_REGION.bbox)).toBe(true); // Tamanrasset
+    expect(isWithinBBox({ lat: 43.2965, lng: 5.3698 }, DEFAULT_REGION.bbox)).toBe(false); // Marseille
+    expect(isWithinBBox({ lat: 13.5116, lng: 2.1254 }, DEFAULT_REGION.bbox)).toBe(false); // Niamey
   });
   it('dégrade une position pour la diffusion publique', () => {
     expect(coarsenLocation({ lat: 36.71234, lng: 4.04567 })).toEqual({ lat: 36.71, lng: 4.05 });

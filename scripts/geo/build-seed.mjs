@@ -6,10 +6,18 @@
  * Usage :
  *   node scripts/geo/build-seed.mjs                 # wilayas par défaut (Kabylie)
  *   node scripts/geo/build-seed.mjs 15 06 10        # wilayas choisies (codes ONS)
+ *   node scripts/geo/build-seed.mjs --all           # toutes les wilayas de dz-geodata
+ *   node scripts/geo/build-seed.mjs --except 15,06  # wilayas à exclure (déjà importées)
+ *   node scripts/geo/build-seed.mjs --region <id>   # région de rattachement (défaut : kabylie)
  *   node scripts/geo/build-seed.mjs --out <fichier> # chemin de sortie
  *
+ * Couverture nationale (migration 20261120090100_geo_algeria_data.sql) :
+ *   node scripts/geo/build-seed.mjs --all --except 15,06,10,35,34,19 --region algerie \
+ *     --out supabase/migrations/20261120090100_geo_algeria_data.sql
+ *
  * Le fichier produit est idempotent (upsert) : il peut être rejoué pour mettre à jour
- * les contours ou étendre la couverture à d'autres wilayas.
+ * les contours ou étendre la couverture à d'autres wilayas. La région doit exister
+ * (table public.regions) avant l'exécution du fichier.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -22,15 +30,37 @@ const pkg = JSON.parse(
 );
 
 const DEFAULT_WILAYAS = ['15', '06', '10', '35', '34', '19'];
-const REGION_ID = 'kabylie';
 
 const args = process.argv.slice(2);
 let out = join(repoRoot, 'supabase', 'migrations', '20261030101000_geo_reference_data.sql');
+let regionId = 'kabylie';
+let all = false;
 const codes = [];
+const excluded = new Set();
+const valueOf = (i) => {
+  const value = args[i + 1];
+  if (!value || value.startsWith('--')) {
+    console.error(`Valeur manquante pour ${args[i]}`);
+    process.exit(1);
+  }
+  return value;
+};
 for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--out') {
-    out = resolve(args[i + 1]);
+    out = resolve(valueOf(i));
     i += 1;
+  } else if (args[i] === '--region') {
+    regionId = valueOf(i);
+    if (!/^[a-z][a-z0-9_]{1,40}$/.test(regionId)) {
+      console.error(`Identifiant de région invalide : ${regionId}`);
+      process.exit(1);
+    }
+    i += 1;
+  } else if (args[i] === '--except') {
+    for (const code of valueOf(i).split(',')) excluded.add(code.trim());
+    i += 1;
+  } else if (args[i] === '--all') {
+    all = true;
   } else if (/^\d{2}$/.test(args[i])) {
     codes.push(args[i]);
   } else {
@@ -38,13 +68,23 @@ for (let i = 0; i < args.length; i += 1) {
     process.exit(1);
   }
 }
-const wilayaCodes = codes.length > 0 ? codes : DEFAULT_WILAYAS;
 
 const read = (name) => JSON.parse(readFileSync(join(dataDir, name), 'utf8'));
 const provenance = read('provenance.json');
 const wilayasGeo = read('wilayas.geojson');
 const communesGeo = read('communes.geojson');
 const dairas = read('dairas.json');
+
+const requested = all
+  ? wilayasGeo.features.map((f) => f.properties.code).sort()
+  : codes.length > 0
+    ? codes
+    : DEFAULT_WILAYAS;
+const wilayaCodes = requested.filter((code) => !excluded.has(code));
+if (wilayaCodes.length === 0) {
+  console.error('Aucune wilaya à importer.');
+  process.exit(1);
+}
 
 const dairaById = new Map(dairas.map((d) => [d.osm_id, d]));
 
@@ -69,8 +109,26 @@ if (missing.length > 0) {
   console.error(`Wilayas introuvables dans dz-geodata : ${missing.join(', ')}`);
   process.exit(1);
 }
+/*
+ * Codes ONS absents de l'extrait OSM, complétés d'après la nomenclature officielle des
+ * communes (ONS). Clé : identifiant de la relation OSM. Seul cas connu : Aïn Defla, chef-lieu
+ * de la wilaya 44, code 4401 (seul code manquant de la série 4401–4436).
+ */
+const ONS_CODE_OVERRIDES = new Map([[21037899, '4401']]);
+
 const communeFeatures = communesGeo.features
   .filter((f) => wilayaCodes.includes(f.properties.wilaya_code))
+  .map((f) => {
+    const onsCode = f.properties.ons_code ?? ONS_CODE_OVERRIDES.get(f.properties.osm_id) ?? null;
+    if (!onsCode) {
+      console.error(
+        `Commune sans code ONS : ${f.properties.name_fr} (OSM ${f.properties.osm_id}). ` +
+          'Compléter ONS_CODE_OVERRIDES avec le code officiel.',
+      );
+      process.exit(1);
+    }
+    return { ...f, properties: { ...f.properties, ons_code: onsCode } };
+  })
   .sort((a, b) => a.properties.ons_code.localeCompare(b.properties.ons_code));
 
 const lines = [];
@@ -79,7 +137,8 @@ lines.push('-- FICHIER GÉNÉRÉ par scripts/geo/build-seed.mjs — ne pas modif
 lines.push(`-- Source : ${pkg.name} ${pkg.version} — ${provenance.source}`);
 lines.push(`-- Extrait du ${provenance.extract_date} (sha256 ${provenance.extract_sha256})`);
 lines.push(`-- Licence des données : ${provenance.license} — ${provenance.attribution}`);
-lines.push(`-- Wilayas : ${wilayaCodes.join(', ')} — ${communeFeatures.length} communes`);
+lines.push(`-- Région : ${regionId} — wilayas : ${wilayaCodes.join(', ')}`);
+lines.push(`-- ${wilayaFeatures.length} wilayas, ${communeFeatures.length} communes`);
 lines.push('-- =====================================================================');
 lines.push('');
 
@@ -89,7 +148,7 @@ for (const f of wilayaFeatures) {
     'insert into public.wilayas (code, region_id, name_fr, name_ar, name_en, boundary, osm_id, wikidata, data_source)',
   );
   lines.push(
-    `values (${lit(p.code)}, ${lit(REGION_ID)}, ${lit(p.name_fr)}, ${lit(p.name_ar)}, ${lit(p.name_en)},`,
+    `values (${lit(p.code)}, ${lit(regionId)}, ${lit(p.name_fr)}, ${lit(p.name_ar)}, ${lit(p.name_en)},`,
   );
   lines.push(`  ${geom(f.geometry)},`);
   lines.push(`  ${lit(p.osm_id)}, ${lit(p.wikidata)}, ${lit(`osm:${pkg.name}@${pkg.version}`)})`);
@@ -145,7 +204,7 @@ for (const f of communeFeatures) {
 lines.push('update public.regions r');
 lines.push('set bbox = (select extensions.st_envelope(extensions.st_union(w.boundary))');
 lines.push('            from public.wilayas w where w.region_id = r.id)');
-lines.push(`where r.id = ${lit(REGION_ID)};`);
+lines.push(`where r.id = ${lit(regionId)};`);
 lines.push('');
 
 writeFileSync(out, `${lines.join('\n')}`);

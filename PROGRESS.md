@@ -1,21 +1,21 @@
 # Avancement — Tamurt Alerte
 
-Dernière mise à jour : 30/10/2026. Légende : ✅ terminé et vérifié · 🟡 fait mais non vérifiable ici
+Dernière mise à jour : 20/11/2026. Légende : ✅ terminé et vérifié · 🟡 fait mais non vérifiable ici
 · ⛔ bloqué par un élément externe (clé, réseau, compte, appareil).
 
 ## Résultats de vérification (dernière exécution, environnement local)
 
-| Vérification                                                  | Résultat                                                                                               |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `pnpm format:check` / `pnpm lint` / `pnpm typecheck`          | ✅ sans erreur (6 paquets)                                                                             |
-| Tests unitaires (`pnpm test`)                                 | ✅ 92 : shared 59, server 22, mobile 8, web 3                                                          |
-| Tests d'intégration sur base réelle (`pnpm test:integration`) | ✅ 65 (9 fichiers) : RLS, signalements, modération, villages, entraide, notifications, comptes, médias |
-| Lint SQL (`supabase db lint`, plpgsql_check)                  | ✅ aucune erreur                                                                                       |
-| Tests end-to-end Playwright (`pnpm test:e2e`)                 | ✅ 17 réussis (mobile + desktop), 3 ignorés à dessein (parcours complet joué une fois)                 |
-| Build web (`pnpm build`)                                      | ✅                                                                                                     |
-| Bundles mobiles Metro Android + iOS                           | ✅ (Hermes, 6,8 Mo chacun)                                                                             |
-| Exécution sur appareil / émulateur mobile                     | ⛔ aucun appareil ni émulateur disponible                                                              |
-| CI GitHub Actions                                             | 🟡 workflows écrits, jamais exécutés (aucun dépôt distant)                                             |
+| Vérification                                                  | Résultat                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `pnpm format:check` / `pnpm lint` / `pnpm typecheck`          | ✅ sans erreur (6 paquets)                                                                       |
+| Tests unitaires (`pnpm test`)                                 | ✅ 93 : shared 60, server 22, mobile 8, web 3                                                    |
+| Tests d'intégration sur base réelle (`pnpm test:integration`) | ✅ 67 (9 fichiers), dont la couverture nationale ; rejoués deux fois de suite sans réinitialiser |
+| Lint SQL (`supabase db lint`, plpgsql_check)                  | ✅ aucune erreur dans `public` et `private` (avertissements internes à PostGIS seulement)        |
+| Tests end-to-end Playwright (`pnpm test:e2e`)                 | ✅ 17 réussis (mobile + desktop), 3 ignorés à dessein (parcours complet joué une fois)           |
+| Build web (`pnpm build`)                                      | ✅                                                                                               |
+| Bundles mobiles Metro Android + iOS                           | ✅ (Hermes, 6,8 Mo chacun)                                                                       |
+| Exécution sur appareil / émulateur mobile                     | ⛔ aucun appareil ni émulateur disponible                                                        |
+| CI GitHub Actions                                             | ✅ passée sur `main` (16/11/2026) ; relancée à chaque push sur `main`                            |
 
 ## Phase 0 — Audit et initialisation ✅
 
@@ -37,17 +37,50 @@ Vitest, Playwright, Supabase local (Postgres 17 + PostGIS), CI.
 
 ## Identité visuelle (DA Tamurt Services) ✅ web · 🟡 mobile
 
-- **Web, appliqué.** Rouge signal, blanc et noir. Polices Anton et Inter Tight, boutons à pans coupés avec socle noir, cartes à bande rouge. Rubalise sous l'accueil, logos, icônes et manifeste, bouton yaz.
+- **Web, appliqué.** Rouge signal, blanc et noir. Polices Anton et Inter Tight, boutons à pans coupés avec socle noir, cartes à bande rouge. Logos, icônes et manifeste, bouton yaz. La rubalise rouge et blanche sous l'accueil a été retirée le 20/11/2026 (voir ci-dessous).
 - **Vérifié** : typecheck, lint, Prettier, tests (shared 59, mobile 8, server 22, web 3), build. Axe WCAG A/AA sur 5 pages publiques, en clair et en sombre : 0 violation critique ou sérieuse.
 - **Non relancés** : les E2E (`apps/web/e2e`). Ils exigent la pile Supabase locale, indisponible dans l'environnement de travail.
 - **Mobile, en partie.** Les couleurs et les coins viennent du thème partagé. L'icône et l'icône adaptative Android viennent du kit, et les couleurs restantes (carte, notifications) sont alignées. Les polices Anton et Inter Tight ne sont pas encore chargées dans l'app Expo, et le rendu n'a pas été contrôlé sur appareil.
 - **Slogan** : « Veillons ensemble sur notre terre » est conservé.
 
+## Couverture nationale et refonte de l'accueil (20/11/2026) ✅ web · 🟡 mobile
+
+- **Toute l'Algérie** : référentiel étendu aux 69 wilayas (découpage de 2025) et 1 538 communes
+  OSM. Deux migrations additives : `20261120090000_coverage_algeria.sql` (région `algerie`,
+  réglage `coverage`, fonctions de carte) et `20261120090100_geo_algeria_data.sql` (générée par
+  `scripts/geo/build-seed.mjs --all --except … --region algerie`). Aucune donnée supprimée : la
+  région `kabylie` est conservée, ses 6 wilayas sont rattachées à `algerie`.
+- Aïn Defla (chef-lieu de la wilaya 44) n'a pas de code ONS dans l'extrait OSM : le script la
+  complète avec son code officiel 4401 et échoue si une autre commune en manquait.
+- `DEFAULT_REGION` = `ALGERIA_REGION` (web, mobile, serveur). Les signalements, lieux suivis et
+  villages sont acceptés partout en Algérie (Alger, Tamanrasset testés) et refusés hors du pays
+  (Tunis testé).
+- **Séismes** : l'emprise interrogée déborde sur les voisins ; seuls les épicentres à moins de
+  50 km du territoire deviennent des événements (`coverage_distance_km`, réservée au rôle
+  service, testée avec un séisme fictif au nord du Maroc). **Météo** : 2 points par wilaya
+  (`wilaya_forecast_points`) au lieu des 40 communes les plus peuplées, qui seraient à Alger.
+- **Carte** : vue initiale sur tout le pays ; fond de repli = contours des wilayas (115 Ko),
+  communes chargées au zoom 7 pour les seules wilayas visibles (vérifié autour d'Alger).
+  Accueil : carte pleine largeur (jusqu'à 1 440 px) et haute (340 à 600 px), légende posée sur la
+  carte en grand écran. Page Carte élargie.
+- **Accueil** : rubalise retirée ; illustrations originales animées (l'Algérie sous un balayage
+  radar dans le bandeau, village paisible pour « rien à signaler », village suivi avec cloche),
+  catégories en tuiles. Animations coupées si l'utilisateur limite les mouvements. Vérifié en
+  clair, en sombre et à 390 px (aucun débordement).
+- **Textes** : « Kabylie » → « Algérie » (fr, ar), page À propos, README.
+- **Vérifié** : format, lint, typecheck, tests unitaires (93), intégration (67), lint SQL, e2e
+  (17 réussis, dont axe), build web, bundles Android et iOS.
+- 🟡 **Mobile** : contours des wilayas et zoom minimal abaissé pour voir tout le pays. Le détail
+  communal au zoom n'existe que sur le web. Non contrôlé sur appareil.
+- **À savoir avant d'activer les sources** : au Sahara, les torchères pétrolières apparaîtront
+  comme points chauds FIRMS (jamais comme événements) ; les seuils Open-Meteo (40 °C…) ont été
+  fixés pour le Nord et devront être adaptés par zone climatique.
+
 ## Phase 2 — Backend ✅
 
-13 migrations (toutes additives), RLS partout, `GRANT` explicites, fonctions `SECURITY DEFINER`,
-outbox transactionnelle, rétention planifiée (pg_cron), référentiel OSM (6 wilayas,
-289 communes), stockage (quarantaine / public), audit.
+15 migrations (toutes additives), RLS partout, `GRANT` explicites, fonctions `SECURITY DEFINER`,
+outbox transactionnelle, rétention planifiée (pg_cron), référentiel OSM (69 wilayas,
+1 538 communes, toute l'Algérie), stockage (quarantaine / public), audit.
 
 ## Phase 3 — Carte et signalements ✅ (fond de carte : 🟡)
 
@@ -59,8 +92,9 @@ outbox transactionnelle, rétention planifiée (pg_cron), référentiel OSM (6 w
   hors ligne idempotente, limites (5/h, 20/j), doublons proches, retrait, contestation.
 - Statuts et plafonds de gravité imposés en base ; **pas d'auto-modération ni
   d'auto-confirmation** (corrigé et testé dans cette phase).
-- 🟡 Aucun fournisseur de tuiles configuré : fond de repli (contours des communes). Le style
-  distant est prêt (`NEXT_PUBLIC_MAP_STYLE_URL`, `EXPO_PUBLIC_MAP_STYLE_URL`).
+- 🟡 Aucun fournisseur de tuiles configuré : fond de repli (contours des wilayas, puis des
+  communes en zoomant). Le style distant est prêt (`NEXT_PUBLIC_MAP_STYLE_URL`,
+  `EXPO_PUBLIC_MAP_STYLE_URL`).
 
 ## Phase 4 — Mes villages ✅
 
@@ -111,8 +145,9 @@ Tests unitaires, intégration, e2e, CI (avec provisionnement e2e), documentation
 - **Clés** (côté serveur uniquement) : `NASA_FIRMS_MAP_KEY` (gratuite), `OPEN_METEO_API_KEY`
   (si usage commercial), clés VAPID (Web Push), `EAS_PROJECT_ID` (+ identifiants FCM / APNs) pour
   le push mobile, `CRON_SECRET`.
-- **Décisions** : activation de chaque source selon sa licence ; fournisseur de fond de carte ;
+- **Décisions** : activation de chaque source selon sa licence (voir torchères FIRMS et seuils
+  Open-Meteo au Sahara) ; fournisseur de fond de carte ;
   relecture juridique des pages Confidentialité / Conditions ; vérification des numéros
   d'urgence ; relecture de l'arabe et traduction kabyle par des locuteurs natifs ; plan Vercel
   (tâches fréquentes) ; comptes Apple / Google pour les stores.
-- Le dépôt Git est local au conteneur (éphémère) : aucun commit ni dépôt distant à ce stade.
+- Le code est sur GitHub (branche `main`) ; **aucun déploiement** n'a été effectué.

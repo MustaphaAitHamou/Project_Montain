@@ -2,6 +2,8 @@ import sharp from 'sharp';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   ALGER,
+  TAMANRASSET,
+  TUNIS,
   anonClient,
   closeDb,
   createUser,
@@ -44,6 +46,23 @@ describe('soumission de signalement', () => {
     });
   });
 
+  it('couvre tout le territoire national, du Nord au Grand Sud', async () => {
+    // Compte dédié : la limite serveur est de 5 signalements par heure et par compte.
+    const erin = await createUser('erin');
+    const north = await erin.client.rpc(
+      'submit_report',
+      reportParams({ p_lat: ALGER.lat, p_lng: ALGER.lng }),
+    );
+    expect(north.error).toBeNull();
+    expect(north.data.commune_code).toMatch(/^16\d{2}$/);
+    const south = await erin.client.rpc(
+      'submit_report',
+      reportParams({ p_lat: TAMANRASSET.lat, p_lng: TAMANRASSET.lng }),
+    );
+    expect(south.error).toBeNull();
+    expect(south.data.commune_code).toBe('1101');
+  });
+
   it('est idempotent pour un même identifiant client (file hors ligne)', async () => {
     const params = reportParams();
     const first = await alice.client.rpc('submit_report', params);
@@ -52,7 +71,7 @@ describe('soumission de signalement', () => {
   });
 
   it.each([
-    [{ p_lat: ALGER.lat, p_lng: ALGER.lng }, 'outside_coverage'],
+    [{ p_lat: TUNIS.lat, p_lng: TUNIS.lng }, 'outside_coverage'],
     [{ p_subcategory_id: 'fire.confirmed' }, 'subcategory_invalid'],
     [
       { p_category_id: 'mutual_aid', p_subcategory_id: 'mutual_aid.logistics' },

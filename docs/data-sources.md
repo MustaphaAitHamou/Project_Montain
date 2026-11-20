@@ -29,9 +29,13 @@ n'est intégrée pour le moment ») au lieu d'inventer une source.
 ## EMSC — séismes
 
 - Point d'accès : `https://www.seismicportal.eu/fdsnws/event/1/query` (format texte FDSN).
-- Requête limitée à l'emprise de la Kabylie élargie, magnitude ≥ `minMagnitude` (2,5 par défaut),
+- Requête limitée à l'emprise de l'Algérie élargie en mer (`DEFAULT_REGION.sourceQueryBBox`,
+  ouest −9,2 ; sud 18,5 ; est 12,3 ; nord 38,2), magnitude ≥ `minMagnitude` (2,5 par défaut),
   fenêtre `lookbackHours` (72 h). Toutes les secousses sont enregistrées comme observations
-  (couche « Séismes ») ; à partir de `eventMinMagnitude` (3,0), un événement public
+  (couche « Séismes »). Cette emprise rectangulaire déborde sur les pays voisins : seuls les
+  épicentres situés en Algérie ou à moins de `eventMaxDistanceKm` (50 km, au large des côtes ou
+  près des frontières) deviennent des événements (fonction `coverage_distance_km`, réservée au
+  backend). À partir de `eventMinMagnitude` (3,0), un événement public
   « Confirmé par une source habilitée » est créé avec une gravité déduite de la magnitude :
   « Vigilance » de M 3,0 à 4,4, « Important » à partir de M 4,5 — **jamais « Critique »
   automatiquement** (réservé à une décision humaine de l'équipe de modération).
@@ -45,7 +49,12 @@ n'est intégrée pour le moment ») au lieu d'inventer une source.
   puis la définir **côté serveur uniquement** : variable `NASA_FIRMS_MAP_KEY` (Vercel → Project →
   Settings → Environment Variables, type « Sensitive »). Elle n'est jamais envoyée au navigateur ni
   à l'application mobile.
-- Produits : VIIRS S-NPP, NOAA-20, NOAA-21 (NRT), `dayRange` = 1 jour, zone = emprise de la Kabylie.
+- Produits : VIIRS S-NPP, NOAA-20, NOAA-21 (NRT), `dayRange` = 1 jour, zone = emprise de l'Algérie
+  (même emprise que les séismes : elle inclut des bandes des pays voisins).
+- À savoir avant activation : au Sahara, les **torchères** des champs pétroliers et gaziers
+  (Hassi Messaoud, In Amenas…) sont détectées chaque jour comme anomalies thermiques. Elles
+  restent de simples observations (jamais d'événement ni de notification) mais apparaîtront sur
+  la couche « Points chauds » ; un filtrage des sources fixes reste à prévoir.
 - Quota documenté par la NASA : nombre de transactions par tranche de 10 minutes et par clé ;
   l'intervalle de synchronisation (30 min) reste très en dessous.
 - Affichage : couche « Points chauds satellites », avec l'avertissement « Une anomalie thermique
@@ -59,10 +68,13 @@ n'est intégrée pour le moment ») au lieu d'inventer une source.
 
 - Sans clé : `https://api.open-meteo.com/v1/forecast` — **usage non commercial uniquement**.
 - Avec `OPEN_METEO_API_KEY` : `https://customer-api.open-meteo.com/v1/forecast` (offre commerciale).
-- Points interrogés : centroïdes des communes (40 au maximum par passage, RPC `commune_points`).
+- Points interrogés : les deux communes les plus peuplées de chaque wilaya (138 points, RPC
+  `wilaya_forecast_points`), pour couvrir tout le pays sans concentrer les points sur Alger.
 - Seuils (`config.thresholds`) : précipitations ≥ 10 mm/h, rafales ≥ 80 km/h, température
   ≥ 40 °C ou ≤ −2 °C. Un dépassement crée une observation « Prévision météorologique », jamais
   une vigilance officielle.
+- À revoir avant activation : ces seuils uniques ont été fixés pour le Nord. Au Sahara, 40 °C est
+  courant l'été ; des seuils par zone climatique seront nécessaires.
 
 ## Robustesse des synchronisations
 
@@ -97,9 +109,21 @@ pnpm demo:clear
 
 ## Villages (référentiel OSM) — plan d'import
 
-Le référentiel livré contient les 6 wilayas et 289 communes de la zone (Tizi Ouzou, Béjaïa,
-Bouira, Boumerdès, Bordj Bou Arréridj, Sétif), extraits d'OpenStreetMap via `dz-geodata`
-(Geofabrik, ODbL). Les **villages** OSM ne sont pas encore importés. En attendant :
+Le référentiel livré couvre **toute l'Algérie** : les 69 wilayas (découpage administratif de 2025) et leurs 1 538 communes, extraits d'OpenStreetMap via `dz-geodata` 0.1.1 (Geofabrik, ODbL).
+Les 6 wilayas de lancement (Tizi Ouzou, Béjaïa, Bouira, Boumerdès, Bordj Bou Arréridj, Sétif,
+289 communes) viennent de `20261030101000_geo_reference_data.sql` ; les 63 autres (1 249 communes)
+de `20261120090100_geo_algeria_data.sql`, généré par
+`node scripts/geo/build-seed.mjs --all --except 15,06,10,35,34,19 --region algerie --out …`.
+Une seule commune n'a pas de code ONS dans l'extrait OSM (Aïn Defla, chef-lieu de la wilaya 44) :
+le script la complète avec son code officiel 4401 (table `ONS_CODE_OVERRIDES`).
+
+Les codes ONS des communes des wilayas créées en 2019 et 2025 gardent le préfixe de leur wilaya
+d'origine (ex. Timimoun 0109, wilaya 49) : le rattachement se lit dans `communes.wilaya_code`.
+
+Sur la carte, le fond de repli affiche les contours simplifiés des wilayas (RPC
+`wilaya_boundaries_geojson`, ~115 Ko) ; le détail communal n'est chargé qu'à partir du zoom 7,
+pour les seules wilayas visibles (RPC `commune_boundaries_geojson`). Les **villages** OSM ne sont
+pas encore importés. En attendant :
 
 - un utilisateur peut suivre une commune, ou placer un **lieu personnalisé** sur la carte ;
 - en cochant « Proposer aussi ce lieu comme village du référentiel », il crée une proposition
@@ -111,7 +135,7 @@ Bouira, Boumerdès, Bordj Bou Arréridj, Sétif), extraits d'OpenStreetMap via `
 Import OSM prévu (non exécuté : l'API Overpass était inaccessible depuis l'environnement de
 développement) :
 
-1. Requête Overpass sur l'emprise de chaque wilaya : `node["place"~"village|hamlet|isolated_dwelling"]`.
+1. Requête Overpass sur l'emprise de chaque wilaya (69) : `node["place"~"village|hamlet|isolated_dwelling"]`.
 2. Conservation de `name`, `name:fr`, `name:ar`, `name:kab`, `alt_name` et de la position.
 3. Rattachement à la commune par `private.commune_at(location)` (contours déjà en base).
 4. Insertion dans `public.villages` : `source = 'osm'`, `source_ref = 'node/<id>'`,

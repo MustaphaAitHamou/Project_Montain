@@ -200,7 +200,8 @@ export const fr = {
   home: {
     title: 'Situation',
     zone: 'Zone',
-    zoneDefault: 'Kabylie',
+    zoneDefault: 'Algérie',
+    coverageDetail: '69 wilayas · 1 538 communes',
     activeCount_one: '{count} événement actif visible',
     activeCount_other: '{count} événements actifs visibles',
     noAlerts: 'Aucune alerte signalée dans les sources actuellement disponibles.',
@@ -217,6 +218,11 @@ export const fr = {
       'Aucune vigilance météorologique officielle n’est intégrée pour le moment. Consultez l’Office national de la météorologie.',
     sourcesTitle: 'Sources de données',
     openMap: 'Ouvrir la carte',
+    mapTitle: 'La situation sur la carte',
+    mapHint: 'Toute l’Algérie, du littoral au Grand Sud. Zoomez pour afficher les communes.',
+    followedPitch:
+      'Suivez votre village ou votre quartier : vous serez prévenu des événements qui le concernent.',
+    allClearTitle: 'Rien à signaler pour le moment',
   },
   map: {
     title: 'Carte',
@@ -353,7 +359,7 @@ export const fr = {
     queuedOffline:
       'Vous êtes hors connexion : le signalement est conservé sur cet appareil et sera envoyé au retour du réseau.',
     outsideCoverage:
-      'Cette position est en dehors de la zone actuellement couverte (Kabylie). Le signalement ne peut pas être traité.',
+      'Cette position est en dehors de la zone couverte (Algérie). Le signalement ne peut pas être traité.',
     rateLimited: 'Trop de signalements en peu de temps. Réessayez plus tard.',
     duplicateHint:
       'Des événements similaires existent déjà à proximité. Vérifiez qu’il ne s’agit pas du même avant d’envoyer.',
@@ -532,7 +538,7 @@ export const fr = {
   onboarding: {
     welcomeTitle: 'Azul, bienvenue sur Tamurt Alerte',
     welcomeBody:
-      'Suivez les événements dangereux et les perturbations dans vos villages et communes de Kabylie.',
+      'Suivez les événements dangereux et les perturbations dans vos villages et communes, partout en Algérie.',
     notOfficialTitle: 'Un outil communautaire',
     notOfficialBody:
       'Tamurt Alerte n’est pas un service officiel de secours. Les informations sont vérifiées avant publication mais peuvent être incomplètes.',

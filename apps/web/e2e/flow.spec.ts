@@ -53,10 +53,16 @@ test.describe('parcours complet', () => {
     await page.getByRole('radio', { name: 'Fumée signalée' }).click();
     await page.getByRole('button', { name: 'Suivant' }).click();
 
-    // Le phénomène est placé sur la carte (pas la position du téléphone).
+    // Le phénomène est placé sur la carte (pas la position du téléphone). La carte couvre toute
+    // l'Algérie : on cherche d'abord le village, puis on touche l'endroit exact.
     const map = page.getByRole('application', { name: /Où se situe le phénomène/ });
     await expect(map.locator('.maplibregl-canvas')).toBeVisible();
-    await page.waitForTimeout(1500);
+    await page.getByLabel('Rechercher un lieu').fill('Iferhounene');
+    await page
+      .getByRole('button', { name: /^Iferhounene/ })
+      .first()
+      .click();
+    await page.waitForTimeout(2500); // fin du déplacement de la carte
     const box = await map.boundingBox();
     if (!box) throw new Error('carte absente');
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);

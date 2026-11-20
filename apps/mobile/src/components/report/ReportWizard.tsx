@@ -5,7 +5,7 @@ import { randomUUID } from 'expo-crypto';
 import { Camera, ImagePlus, Trash2 } from 'lucide-react-native';
 import {
   DEFAULT_UNCERTAINTY_M,
-  KABYLIE_REGION,
+  DEFAULT_REGION,
   LIMITS,
   type CategoryId,
   type LatLng,
@@ -130,7 +130,7 @@ export function ReportWizard({ userId }: { userId: string }) {
       setError(parsed.error.issues[0]?.message ?? 'common.errorGeneric');
       return;
     }
-    if (location && !isWithinBBox(location, KABYLIE_REGION.bbox)) {
+    if (location && !isWithinBBox(location, DEFAULT_REGION.bbox)) {
       setError('report.outsideCoverage');
       return;
     }

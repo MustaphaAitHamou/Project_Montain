@@ -65,7 +65,7 @@ export default function LocationPickerNative({
           onChange({ lat, lng });
         }}
       >
-        <Camera ref={camera} initialViewState={{ bounds: COVERAGE }} minZoom={6} maxZoom={18} />
+        <Camera ref={camera} initialViewState={{ bounds: COVERAGE }} minZoom={3} maxZoom={18} />
         <GeoJSONSource id="pick" data={data}>
           <Layer
             id="pick-area"

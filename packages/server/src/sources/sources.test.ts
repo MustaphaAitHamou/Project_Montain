@@ -5,7 +5,7 @@
  * vérifié par ces tests.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { KABYLIE_REGION } from '@tamurt/shared';
+import { DEFAULT_REGION } from '@tamurt/shared';
 import { backoffDelay, fetchWithRetry, HttpError } from '../http';
 import { buildEmscUrl, earthquakeSeverity, parseFdsnText } from './emsc';
 import { buildFirmsUrl, parseFirmsCsv } from './firms';
@@ -23,13 +23,14 @@ describe('EMSC (format texte FDSN)', () => {
   it('construit une requête bornée à la zone et à la période', () => {
     const url = new URL(
       buildEmscUrl({
-        bbox: KABYLIE_REGION.sourceQueryBBox,
+        bbox: DEFAULT_REGION.sourceQueryBBox,
         now: new Date('2026-07-15T12:00:00Z'),
         config: {},
       }),
     );
     expect(url.searchParams.get('format')).toBe('text');
-    expect(url.searchParams.get('minlatitude')).toBe('35.300');
+    expect(url.searchParams.get('minlatitude')).toBe('18.500');
+    expect(url.searchParams.get('maxlongitude')).toBe('12.300');
     expect(url.searchParams.get('starttime')).toBe('2026-07-12T12:00:00');
     expect(url.searchParams.get('minmagnitude')).toBe('2.5');
   });

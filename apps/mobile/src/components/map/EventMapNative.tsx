@@ -17,7 +17,7 @@ import {
 } from '@tamurt/shared';
 import { useTheme } from '@/theme/ThemeProvider';
 import { useI18n } from '@/lib/i18n';
-import { COVERAGE, loadCommuneBoundaries, mapStyleFor, usesFallbackStyle } from './mapStyle';
+import { COVERAGE, loadWilayaBoundaries, mapStyleFor, usesFallbackStyle } from './mapStyle';
 import {
   categoryColor,
   clusterRadius,
@@ -75,7 +75,7 @@ export default function EventMapNative({
   useEffect(() => {
     if (!usesFallbackStyle) return;
     let alive = true;
-    void loadCommuneBoundaries().then((b) => {
+    void loadWilayaBoundaries().then((b) => {
       if (alive) setBoundaries(b);
     });
     return () => {
@@ -134,13 +134,21 @@ export default function EventMapNative({
         touchPitch={false}
         onRegionDidChange={(e) => onBoundsChange(e.nativeEvent.bounds)}
       >
-        <Camera ref={camera} initialViewState={initialView} minZoom={5} maxZoom={17} />
+        <Camera ref={camera} initialViewState={initialView} minZoom={3} maxZoom={17} />
         {boundaries ? (
-          <GeoJSONSource id="communes" data={boundaries}>
+          <GeoJSONSource id="wilayas" data={boundaries}>
             <Layer
-              id="communes-line"
+              id="wilayas-fill"
+              type="fill"
+              paint={{
+                'fill-color': scheme === 'dark' ? '#24221f' : '#ffffff',
+                'fill-opacity': 0.8,
+              }}
+            />
+            <Layer
+              id="wilayas-line"
               type="line"
-              paint={{ 'line-color': scheme === 'dark' ? '#3d5566' : '#9fb5a8', 'line-width': 0.8 }}
+              paint={{ 'line-color': scheme === 'dark' ? '#8c857c' : '#5c5852', 'line-width': 0.8 }}
             />
           </GeoJSONSource>
         ) : null}

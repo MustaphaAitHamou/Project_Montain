@@ -2,9 +2,10 @@
 
 > **Veillons ensemble sur notre terre.** — une application de Tamurt Services.
 
-Application communautaire de surveillance et d'information géolocalisée pour la Kabylie (Algérie)
-et sa diaspora : carte des événements, signalements vérifiés, suivi de « Mes villages »,
-notifications ciblées, sources externes (séismes, points chauds satellites, météo) et modération.
+Application communautaire de surveillance et d'information géolocalisée pour toute l'Algérie
+(69 wilayas, lancement en Kabylie) et sa diaspora : carte des événements, signalements vérifiés,
+suivi de « Mes villages », notifications ciblées, sources externes (séismes, points chauds
+satellites, météo) et modération.
 
 > ⚠️ Tamurt Alerte **n'est pas un service officiel de secours** et ne garantit pas une alerte
 > immédiate. En cas de danger, suivez les consignes des autorités et des services de secours.

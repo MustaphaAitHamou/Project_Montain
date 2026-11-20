@@ -7,6 +7,11 @@ import { getPublicSources, listActiveEvents } from '@/lib/data/events';
 import { EventMap, type FollowedArea } from '@/components/map/EventMap';
 import { EventCard } from '@/components/events/EventCard';
 import { CategoryIcon } from '@/components/ui/CategoryIcon';
+import {
+  CalmVillageScene,
+  FollowVillagesSpot,
+  VigilMapIllustration,
+} from '@/components/illustrations/AlertScenes';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,163 +47,203 @@ export default async function HomePage() {
   }));
 
   return (
-    <main className="page container stack" id="contenu">
-      <section className="hero stack-sm" aria-labelledby="situation-title">
-        <p className="small" style={{ margin: 0 }}>
-          {t('home.zone')} : <strong>{t('home.zoneDefault')}</strong>
-        </p>
-        <h1 id="situation-title" style={{ margin: 0 }}>
-          {events.length > 0 ? t('home.activeCount', { count: events.length }) : t('home.noAlerts')}
-        </h1>
-        {events.length === 0 && <p style={{ margin: 0 }}>{t('home.noAlertsHint')}</p>}
-        <p className="small" style={{ margin: 0 }}>
-          {error
-            ? t('connectivity.backendUnavailable')
-            : t('common.lastUpdate', { time: formatDateTime(fetchedAt, locale) })}
-        </p>
-        <div className="row">
-          <Link href="/signaler" className="btn btn-inverse">
-            <Megaphone size={18} aria-hidden="true" />
-            {t('home.reportCta')}
-          </Link>
-          <Link href="/carte" className="btn btn-on-brand">
-            {t('home.openMap')}
-          </Link>
-        </div>
-      </section>
-      {/* Rubalise rouge et blanche sous le bandeau d'accueil (décorative, une par écran). */}
-      <div className="frise" aria-hidden="true" />
-
-      <div className="banner banner-info" role="note">
-        <p className="small">
-          {t('app.disclaimerShort')} {t('app.disclaimerEmergency')}
-        </p>
+    <main className="page stack" id="contenu">
+      <div className="container">
+        <section className="hero hero-grid" aria-labelledby="situation-title">
+          <div className="stack-sm">
+            <p className="hero-eyebrow">
+              <span>
+                {t('home.zone')} : <strong>{t('home.zoneDefault')}</strong>
+              </span>
+              <span className="pill">{t('home.coverageDetail')}</span>
+            </p>
+            <h1 id="situation-title" style={{ margin: 0 }}>
+              {events.length > 0
+                ? t('home.activeCount', { count: events.length })
+                : t('home.noAlerts')}
+            </h1>
+            {events.length === 0 && <p style={{ margin: 0 }}>{t('home.noAlertsHint')}</p>}
+            <p className="small" style={{ margin: 0 }}>
+              {error
+                ? t('connectivity.backendUnavailable')
+                : t('common.lastUpdate', { time: formatDateTime(fetchedAt, locale) })}
+            </p>
+            <div className="row">
+              <Link href="/signaler" className="btn btn-inverse">
+                <Megaphone size={18} aria-hidden="true" />
+                {t('home.reportCta')}
+              </Link>
+              <Link href="/carte" className="btn btn-on-brand">
+                {t('home.openMap')}
+              </Link>
+            </div>
+          </div>
+          <VigilMapIllustration className="hero-art" />
+        </section>
       </div>
 
-      <section aria-label={t('map.mapLabel')}>
+      <div className="container">
+        <div className="banner banner-info" role="note">
+          <p className="small">
+            {t('app.disclaimerShort')} {t('app.disclaimerEmergency')}
+          </p>
+        </div>
+      </div>
+
+      <section className="container container-wide stack-sm home-map" aria-labelledby="map-title">
+        <div className="section-head">
+          <h2 id="map-title">{t('home.mapTitle')}</h2>
+          <p className="small muted">{t('home.mapHint')}</p>
+        </div>
         <EventMap
           locale={locale}
           variant="mini"
           initialEvents={events}
           initialFetchedAt={fetchedAt}
           followedAreas={followedAreas}
+          legendOverlay
         />
       </section>
 
-      <div className="grid-2">
-        <section className="card stack-sm" aria-labelledby="followed-title">
+      <div className="container stack">
+        <div className="grid-2">
+          <section className="card stack-sm" aria-labelledby="followed-title">
+            <div className="row-between">
+              <h2 id="followed-title">{t('home.followedTitle')}</h2>
+              <Link href="/villages" className="small">
+                {t('common.seeAll')}
+              </Link>
+            </div>
+            {!user || followed.length === 0 ? (
+              <div className="spot-row">
+                <FollowVillagesSpot />
+                <div className="stack-sm">
+                  <p className="muted" style={{ margin: 0 }}>
+                    {t('home.followedPitch')}
+                  </p>
+                  {!user ? (
+                    <>
+                      <p className="small muted" style={{ margin: 0 }}>
+                        {t('villages.signInToSync')}
+                      </p>
+                      <Link
+                        href="/connexion?next=/villages"
+                        className="btn btn-primary"
+                        style={{ alignSelf: 'flex-start' }}
+                      >
+                        {t('common.signIn')}
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <p className="small muted" style={{ margin: 0 }}>
+                        {t('home.followedEmpty')}
+                      </p>
+                      <Link
+                        href="/villages/ajouter"
+                        className="btn btn-primary"
+                        style={{ alignSelf: 'flex-start' }}
+                      >
+                        <Plus size={18} aria-hidden="true" />
+                        {t('home.followedEmptyCta')}
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <ul className="list-plain stack-sm">
+                {followed.slice(0, 5).map((f) => (
+                  <li key={f.id}>
+                    <Link href={`/villages/${f.id}`} className="row-between card card-link">
+                      <span>
+                        <strong>{f.label}</strong>
+                        <span className="small muted"> · {f.commune_name_fr ?? ''}</span>
+                      </span>
+                      <span
+                        className={
+                          f.active_events > 0 ? 'badge badge-vigilance' : 'badge badge-neutral'
+                        }
+                      >
+                        {f.active_events > 0
+                          ? t('villages.activeAlerts', { count: f.active_events })
+                          : t('villages.noActiveAlerts')}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="card stack-sm" aria-labelledby="categories-title">
+            <h2 id="categories-title">{t('home.quickCategories')}</h2>
+            <div className="category-tiles">
+              {CATEGORIES.filter((c) => c.module === 'alerts').map((c) => (
+                <Link key={c.id} href={`/alertes?categorie=${c.id}`} className="category-tile">
+                  <CategoryIcon categoryId={c.id} size={18} withBackground />
+                  {tk(`category.${c.id}`)}
+                </Link>
+              ))}
+              <Link href="/entraide" className="category-tile">
+                <CategoryIcon categoryId="mutual_aid" size={18} withBackground />
+                {t('nav.assistance')}
+              </Link>
+            </div>
+          </section>
+        </div>
+
+        <section className="stack-sm" aria-labelledby="latest-title">
           <div className="row-between">
-            <h2 id="followed-title">{t('home.followedTitle')}</h2>
-            <Link href="/villages" className="small">
+            <h2 id="latest-title">{t('home.latestTitle')}</h2>
+            <Link href="/alertes" className="small">
               {t('common.seeAll')}
             </Link>
           </div>
-          {!user ? (
-            <>
-              <p className="muted">{t('villages.signInToSync')}</p>
-              <Link href="/connexion?next=/villages" className="btn btn-primary">
-                {t('common.signIn')}
-              </Link>
-            </>
-          ) : followed.length === 0 ? (
-            <>
-              <p className="muted">{t('home.followedEmpty')}</p>
-              <Link href="/villages/ajouter" className="btn btn-primary">
-                <Plus size={18} aria-hidden="true" />
-                {t('home.followedEmptyCta')}
-              </Link>
-            </>
+          {events.length === 0 ? (
+            <div className="card empty-state">
+              <CalmVillageScene className="empty-illustration" />
+              <p className="empty-title">{t('home.allClearTitle')}</p>
+              <p className="small">{t('home.noAlertsHint')}</p>
+            </div>
           ) : (
             <ul className="list-plain stack-sm">
-              {followed.slice(0, 5).map((f) => (
-                <li key={f.id}>
-                  <Link href={`/villages/${f.id}`} className="row-between card card-link">
-                    <span>
-                      <strong>{f.label}</strong>
-                      <span className="small muted"> · {f.commune_name_fr ?? ''}</span>
-                    </span>
-                    <span
-                      className={
-                        f.active_events > 0 ? 'badge badge-vigilance' : 'badge badge-neutral'
-                      }
-                    >
-                      {f.active_events > 0
-                        ? t('villages.activeAlerts', { count: f.active_events })
-                        : t('villages.noActiveAlerts')}
-                    </span>
-                  </Link>
+              {events.slice(0, 5).map((event) => (
+                <li key={event.id}>
+                  <EventCard event={event} locale={locale} t={t} tk={tk} />
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        <section className="card stack-sm" aria-labelledby="categories-title">
-          <h2 id="categories-title">{t('home.quickCategories')}</h2>
-          <div className="row">
-            {CATEGORIES.filter((c) => c.module === 'alerts').map((c) => (
-              <Link key={c.id} href={`/alertes?categorie=${c.id}`} className="chip">
-                <CategoryIcon categoryId={c.id} size={16} />
-                {tk(`category.${c.id}`)}
-              </Link>
-            ))}
-            <Link href="/entraide" className="chip">
-              <CategoryIcon categoryId="mutual_aid" size={16} />
-              {t('nav.assistance')}
-            </Link>
-          </div>
-        </section>
-      </div>
-
-      <section className="stack-sm" aria-labelledby="latest-title">
-        <div className="row-between">
-          <h2 id="latest-title">{t('home.latestTitle')}</h2>
-          <Link href="/alertes" className="small">
-            {t('common.seeAll')}
-          </Link>
+        <div className="grid-2">
+          <section className="card stack-sm" aria-labelledby="vigilance-title">
+            <h2 id="vigilance-title">{t('home.vigilanceTitle')}</h2>
+            <p className="muted small">{t('home.vigilanceNone')}</p>
+          </section>
+          <section className="card stack-sm" aria-labelledby="sources-title">
+            <h2 id="sources-title">{t('home.sourcesTitle')}</h2>
+            <ul className="list-plain stack-sm small">
+              {sources.map((s) => (
+                <li key={s.id} className="row-between">
+                  <span>
+                    <strong>{s.name}</strong>
+                    <br />
+                    <span className="muted">{s.attribution}</span>
+                  </span>
+                  <span className={s.enabled ? 'badge badge-neutral' : 'badge badge-unverified'}>
+                    {s.enabled
+                      ? s.last_success_at
+                        ? formatDateTime(s.last_success_at, locale)
+                        : t('admin.enabled')
+                      : t('admin.disabled')}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
-        {events.length === 0 ? (
-          <div className="card empty-state">
-            <p>{t('home.noAlerts')}</p>
-            <p className="small">{t('home.noAlertsHint')}</p>
-          </div>
-        ) : (
-          <ul className="list-plain stack-sm">
-            {events.slice(0, 5).map((event) => (
-              <li key={event.id}>
-                <EventCard event={event} locale={locale} t={t} tk={tk} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <div className="grid-2">
-        <section className="card stack-sm" aria-labelledby="vigilance-title">
-          <h2 id="vigilance-title">{t('home.vigilanceTitle')}</h2>
-          <p className="muted small">{t('home.vigilanceNone')}</p>
-        </section>
-        <section className="card stack-sm" aria-labelledby="sources-title">
-          <h2 id="sources-title">{t('home.sourcesTitle')}</h2>
-          <ul className="list-plain stack-sm small">
-            {sources.map((s) => (
-              <li key={s.id} className="row-between">
-                <span>
-                  <strong>{s.name}</strong>
-                  <br />
-                  <span className="muted">{s.attribution}</span>
-                </span>
-                <span className={s.enabled ? 'badge badge-neutral' : 'badge badge-unverified'}>
-                  {s.enabled
-                    ? s.last_success_at
-                      ? formatDateTime(s.last_success_at, locale)
-                      : t('admin.enabled')
-                    : t('admin.disabled')}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
       </div>
     </main>
   );

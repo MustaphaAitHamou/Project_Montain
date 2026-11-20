@@ -156,10 +156,13 @@ describe('moteur de notifications (outbox → destinataires → push)', () => {
 
 describe('synchronisation des sources externes (réponses simulées)', () => {
   // Échantillon SYNTHÉTIQUE au format FDSN texte — aucun événement réel.
+  const farQuakeId = `ITEST_FAR_${Date.now()}`;
   const syntheticFdsn = [
     '#EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName',
     `ITEST_${Date.now()}|2026-10-30T08:00:00|36.72|4.06|9.0|EMSC|EMSC|EMSC|X|ml|3.6|EMSC|SYNTHETIC TEST`,
     `ITEST_SMALL_${Date.now()}|2026-10-30T07:00:00|36.70|4.10|5.0|EMSC|EMSC|EMSC|X|ml|2.6|EMSC|SYNTHETIC TEST`,
+    // Épicentre fictif à environ 150 km de la frontière (nord du Maroc) : observation, pas d'événement.
+    `${farQuakeId}|2026-10-30T06:00:00|35.25|-3.93|10.0|EMSC|EMSC|EMSC|X|ml|3.8|EMSC|SYNTHETIC FAR`,
   ].join('\n');
 
   it('ignore une source désactivée et une source sans clé', async () => {
@@ -194,7 +197,15 @@ describe('synchronisation des sources externes (réponses simulées)', () => {
       fetchImpl,
       trigger: 'test',
     });
-    expect(outcome).toMatchObject({ status: 'success', fetched: 2, eventsCreated: 1 });
+    expect(outcome).toMatchObject({ status: 'success', fetched: 3, eventsCreated: 1 });
+    const { rows: far } = await db().query(
+      `select (select count(*)::int from public.external_observations
+                where source_id = 'emsc' and external_id = $1) as observations,
+              (select count(*)::int from public.alert_events
+                where external_source_id = 'emsc' and external_ref = $1) as events`,
+      [farQuakeId],
+    );
+    expect(far[0]).toMatchObject({ observations: 1, events: 0 });
     const { rows: events } = await db().query(
       `select status, severity, source_kind, commune_code, magnitude from public.alert_events
        where external_source_id = 'emsc' and external_ref like 'ITEST_%' order by created_at desc limit 1`,

@@ -44,7 +44,7 @@ export default async function MapPage({
       : undefined;
 
   return (
-    <main className="page container stack" id="contenu">
+    <main className="page container container-wide stack" id="contenu">
       <h1>{t('map.title')}</h1>
       <EventMap
         locale={locale}

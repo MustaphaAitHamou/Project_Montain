@@ -19,9 +19,8 @@ export interface CoverageRegion {
 }
 
 /**
- * Territoire initial : Kabylie. Le référentiel couvre les wilayas de Tizi Ouzou,
- * Béjaïa, Bouira, Boumerdès, Bordj Bou Arréridj et Sétif (communes issues d'OpenStreetMap).
- * L'extension à d'autres régions passe par l'import de nouvelles wilayas (scripts/geo).
+ * Zone de lancement : Kabylie (wilayas de Tizi Ouzou, Béjaïa, Bouira, Boumerdès,
+ * Bordj Bou Arréridj et Sétif). Conservée pour référence ; la couverture active est nationale.
  */
 export const KABYLIE_REGION: CoverageRegion = {
   id: 'kabylie',
@@ -32,7 +31,21 @@ export const KABYLIE_REGION: CoverageRegion = {
   defaultZoom: 8,
 };
 
-export const DEFAULT_REGION = KABYLIE_REGION;
+/**
+ * Couverture nationale : les 69 wilayas d'Algérie (découpage administratif de 2025) et leurs
+ * 1 538 communes, issues d'OpenStreetMap (paquet dz-geodata, ODbL). Emprise calculée sur les
+ * contours importés ; l'emprise des sources externes déborde en mer pour les séismes au large.
+ */
+export const ALGERIA_REGION: CoverageRegion = {
+  id: 'algerie',
+  wilayaCodes: Array.from({ length: 69 }, (_, i) => String(i + 1).padStart(2, '0')),
+  bbox: [-8.669, 18.968, 11.997, 37.09],
+  sourceQueryBBox: [-9.2, 18.5, 12.3, 38.2],
+  center: { lat: 28.2, lng: 2.6 },
+  defaultZoom: 4.6,
+};
+
+export const DEFAULT_REGION = ALGERIA_REGION;
 
 /** Limites anti-abus (appliquées aussi en base). */
 export const LIMITS = {

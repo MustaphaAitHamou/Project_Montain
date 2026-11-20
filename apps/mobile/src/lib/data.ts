@@ -1,6 +1,6 @@
 import {
   ACTIVE_STATUSES,
-  KABYLIE_REGION,
+  DEFAULT_REGION,
   type BBox,
   type EventView,
   type VerificationStatus,
@@ -177,7 +177,7 @@ export function webUrl(path: string): string {
   return `${env.siteUrl.replace(/\/$/, '')}${path}`;
 }
 
-export const COVERAGE_BBOX: BBox = KABYLIE_REGION.bbox;
+export const COVERAGE_BBOX: BBox = DEFAULT_REGION.bbox;
 
 /** Historique des événements autour d'un lieu suivi (PostGIS, rayon en mètres). */
 export async function fetchEventsNear(

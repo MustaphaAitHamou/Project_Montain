@@ -12,11 +12,11 @@ import {
   displayClassFor,
   formatDateTime,
   formatRelativeTime,
-  KABYLIE_REGION,
+  DEFAULT_REGION,
   type VerificationStatus,
 } from '@tamurt/shared';
 import { getTranslator, type Locale } from '@tamurt/shared/i18n';
-import { useMaplibre } from '@/lib/map/useMaplibre';
+import { BOUNDARY_FILL_LAYERS, BOUNDARY_LINE_LAYERS, useMaplibre } from '@/lib/map/useMaplibre';
 import { markerImageId } from '@/lib/map/markers';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { type EventView, eventTitle, placeLabel, toEventView } from '@/lib/events';
@@ -53,6 +53,34 @@ interface Props {
   variant?: 'full' | 'mini';
   followedAreas?: FollowedArea[];
   initialCenter?: { lat: number; lng: number; zoom: number };
+  /** Emprise de départ [ouest, sud, est, nord] (ex. lieux suivis) ; défaut : tout le territoire. */
+  initialBounds?: readonly [number, number, number, number];
+  /** Légende posée sur la carte (grands écrans), pour la carte compacte de l'accueil. */
+  legendOverlay?: boolean;
+}
+
+/** Éléments de légende partagés par la carte complète et la carte compacte. */
+function LegendItems({ t }: { t: ReturnType<typeof getTranslator>['t'] }) {
+  return (
+    <>
+      <li>
+        <span className="legend-dot legend-unverified" /> {t('displayClass.unverified')}
+      </li>
+      <li>
+        <span className="legend-dot legend-community" /> {t('displayClass.community')}
+      </li>
+      <li>
+        <span className="legend-dot legend-institutional" /> {t('displayClass.institutional')}
+      </li>
+      <li>
+        <span className="legend-diamond" /> {t('map.hotspotLabel')}
+      </li>
+      <li>
+        <span className="legend-dot legend-quake" /> {t('category.earthquake')} (
+        {t('event.magnitude')})
+      </li>
+    </>
+  );
 }
 
 function eventsToGeoJSON(events: EventView[]): GeoJSON.FeatureCollection {
@@ -85,15 +113,19 @@ export function EventMap({
   variant = 'full',
   followedAreas = [],
   initialCenter,
+  initialBounds,
+  legendOverlay = false,
 }: Props) {
   const i18n = useMemo(() => getTranslator(locale), [locale]);
   const { t, tk } = i18n;
   const containerRef = useRef<HTMLDivElement>(null);
   const full = variant === 'full';
-  const { map, styleVersion, usingFallback } = useMaplibre(containerRef, {
-    center: initialCenter ?? KABYLIE_REGION.center,
-    zoom:
-      initialCenter?.zoom ?? (full ? KABYLIE_REGION.defaultZoom : KABYLIE_REGION.defaultZoom - 0.5),
+  // Vue initiale : point demandé (lien « Voir sur la carte »), emprise fournie (lieux suivis)
+  // ou tout le territoire couvert.
+  const { map, styleVersion, boundariesVersion, usingFallback } = useMaplibre(containerRef, {
+    center: initialCenter ?? DEFAULT_REGION.center,
+    zoom: initialCenter?.zoom ?? DEFAULT_REGION.defaultZoom,
+    bounds: initialCenter ? undefined : (initialBounds ?? DEFAULT_REGION.bbox),
     interactive: true,
     cooperative: !full,
   });
@@ -352,9 +384,10 @@ export function EventMap({
     set(['events-points', 'events-clusters'], layers.events);
     set(['hotspots'], layers.hotspots);
     set(['earthquakes'], layers.earthquakes);
-    set(['communes-fill', 'communes-line'], layers.boundaries && (usingFallback || full));
+    set([...BOUNDARY_FILL_LAYERS], usingFallback);
+    set([...BOUNDARY_LINE_LAYERS], layers.boundaries && (usingFallback || full));
     set(['followed-fill', 'followed-line'], layers.followed);
-  }, [map, styleVersion, layers, usingFallback, full]);
+  }, [map, styleVersion, boundariesVersion, layers, usingFallback, full]);
 
   // --- Liste accessible des événements visibles -------------------------------------------
   useEffect(() => {
@@ -642,12 +675,22 @@ export function EventMap({
         </div>
       )}
 
-      <div
-        ref={containerRef}
-        className={full ? 'map-canvas' : 'map-canvas map-canvas-mini'}
-        role="region"
-        aria-label={t('map.mapLabel')}
-      />
+      <div className="map-frame">
+        <div
+          ref={containerRef}
+          className={full ? 'map-canvas' : 'map-canvas map-canvas-mini'}
+          role="region"
+          aria-label={t('map.mapLabel')}
+        />
+        {legendOverlay && (
+          <div className="map-legend-overlay card">
+            <strong className="small">{t('map.legend')}</strong>
+            <ul className="list-plain stack-sm small">
+              <LegendItems t={t} />
+            </ul>
+          </div>
+        )}
+      </div>
 
       <div className="row-between small">
         <span
@@ -681,24 +724,8 @@ export function EventMap({
               <strong>{t('map.legend')}</strong>
             </summary>
             <ul className="list-plain stack-sm small" style={{ marginBlockStart: 12 }}>
-              <li>
-                <span className="legend-dot legend-unverified" /> {t('displayClass.unverified')}
-              </li>
-              <li>
-                <span className="legend-dot legend-community" /> {t('displayClass.community')}
-              </li>
-              <li>
-                <span className="legend-dot legend-institutional" />{' '}
-                {t('displayClass.institutional')}
-              </li>
-              <li>
-                <span className="legend-diamond" /> {t('map.hotspotLabel')} —{' '}
-                {t('map.hotspotDisclaimer')}
-              </li>
-              <li>
-                <span className="legend-dot legend-quake" /> {t('category.earthquake')} (
-                {t('event.magnitude')})
-              </li>
+              <LegendItems t={t} />
+              <li className="muted">{t('map.hotspotDisclaimer')}</li>
             </ul>
           </details>
           <section aria-labelledby="visible-events-title" className="stack-sm">

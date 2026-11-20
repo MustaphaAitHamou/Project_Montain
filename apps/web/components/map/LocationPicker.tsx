@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Marker, type GeoJSONSource } from 'maplibre-gl';
 import { Crosshair, Search } from 'lucide-react';
-import { circlePolygon, KABYLIE_REGION } from '@tamurt/shared';
+import { circlePolygon, DEFAULT_REGION } from '@tamurt/shared';
 import { useMaplibre } from '@/lib/map/useMaplibre';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
@@ -55,8 +55,9 @@ export function LocationPicker({
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const { map, styleVersion } = useMaplibre(containerRef, {
-    center: value ?? KABYLIE_REGION.center,
-    zoom: value ? 13 : KABYLIE_REGION.defaultZoom,
+    center: value ?? DEFAULT_REGION.center,
+    zoom: value ? 13 : DEFAULT_REGION.defaultZoom,
+    bounds: value ? undefined : DEFAULT_REGION.bbox,
     showBoundaries: true,
   });
 

@@ -6,7 +6,7 @@ import { ImagePlus, Trash2 } from 'lucide-react';
 import {
   ACCEPTED_IMAGE_MIME_TYPES,
   DEFAULT_UNCERTAINTY_M,
-  KABYLIE_REGION,
+  DEFAULT_REGION,
   LIMITS,
   type CategoryId,
   type LocationPrecision,
@@ -132,7 +132,7 @@ export function ReportWizard({ locale, userId }: { locale: Locale; userId: strin
       setError(parsed.error.issues[0]?.message ?? 'common.errorGeneric');
       return;
     }
-    if (location && !isWithinBBox(location, KABYLIE_REGION.bbox)) {
+    if (location && !isWithinBBox(location, DEFAULT_REGION.bbox)) {
       setError('report.outsideCoverage');
       return;
     }

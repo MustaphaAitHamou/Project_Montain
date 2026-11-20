@@ -6,7 +6,7 @@ import {
   type BBox,
   type CategoryId,
   CATEGORIES,
-  KABYLIE_REGION,
+  DEFAULT_REGION,
   isWithinBBox,
 } from '@tamurt/shared';
 import { fontSizes, spacing } from '@tamurt/shared/theme';
@@ -56,14 +56,14 @@ function CarteContent({ initialFocus }: { initialFocus: MapFocus | null }) {
   const [categories, setCategories] = useState<CategoryId[]>([]);
   const [sinceHours, setSinceHours] = useState<number>(24 * 7);
   const [activeOnly, setActiveOnly] = useState(true);
-  const [bounds, setBounds] = useState<BBox>(KABYLIE_REGION.bbox);
+  const [bounds, setBounds] = useState<BBox>(DEFAULT_REGION.bbox);
   const [focus, setFocus] = useState<MapFocus | null>(initialFocus);
   const [locating, setLocating] = useState(false);
   const [locateMessage, setLocateMessage] = useState<string | null>(null);
 
   // Toute la zone couverte est chargée (PostGIS) puis filtrée sur l'emprise affichée.
   const fetcher = useCallback(
-    () => fetchEventsInBBox(KABYLIE_REGION.bbox, { categories, activeOnly, sinceHours }),
+    () => fetchEventsInBBox(DEFAULT_REGION.bbox, { categories, activeOnly, sinceHours }),
     [categories, activeOnly, sinceHours],
   );
   const cacheKey = `events.map.${categories.join(',')}.${activeOnly}.${sinceHours}`;

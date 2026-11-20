@@ -13,8 +13,8 @@ export default async function AboutPage() {
       <h1>{t('legal.aboutTitle')}</h1>
       <p>
         <strong>{t('app.name')}</strong> — {t('app.slogan')} Application communautaire de
-        surveillance et d’information géolocalisée publiée par {t('app.publisher')}, pour la Kabylie
-        et sa diaspora.
+        surveillance et d’information géolocalisée publiée par {t('app.publisher')}, pour toute
+        l’Algérie et sa diaspora. Lancée en Kabylie, elle couvre désormais les 69 wilayas du pays.
       </p>
       <div className="banner banner-warning" role="note">
         <p>{t('app.disclaimerShort')}</p>

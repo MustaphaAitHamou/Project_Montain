@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
-  ALGER,
+  TUNIS,
   closeDb,
   createUser,
   deleteCreatedUsers,
@@ -75,9 +75,9 @@ describe('Mes villages', () => {
     expect(ok.error).toBeNull();
     const outside = await diaspora.client.from('user_followed_places').insert({
       user_id: diaspora.id,
-      label: 'Alger',
+      label: 'Tunis',
       place_type: 'custom',
-      location: `SRID=4326;POINT(${ALGER.lng} ${ALGER.lat})`,
+      location: `SRID=4326;POINT(${TUNIS.lng} ${TUNIS.lat})`,
       radius_m: 3000,
     });
     expect(outside.error?.message).toContain('outside_coverage');

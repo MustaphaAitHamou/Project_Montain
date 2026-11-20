@@ -6,6 +6,7 @@ import { getSession } from '@/lib/auth';
 import { listPublicEvents } from '@/lib/data/events';
 import { EventCard } from '@/components/events/EventCard';
 import { CategoryIcon } from '@/components/ui/CategoryIcon';
+import { CalmVillageScene } from '@/components/illustrations/AlertScenes';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,6 +88,7 @@ export default async function AlertsPage({
       )}
       {events.length === 0 ? (
         <div className="card empty-state">
+          <CalmVillageScene className="empty-illustration" />
           <p>{t('alerts.empty')}</p>
           {!history && <p className="small">{t('home.noAlertsHint')}</p>}
         </div>

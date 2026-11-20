@@ -1,7 +1,7 @@
 import { Suspense, lazy, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Crosshair } from 'lucide-react-native';
-import { KABYLIE_REGION, type LatLng, isWithinBBox } from '@tamurt/shared';
+import { DEFAULT_REGION, type LatLng, isWithinBBox } from '@tamurt/shared';
 import { fontSizes, spacing } from '@tamurt/shared/theme';
 import { useTheme } from '@/theme/ThemeProvider';
 import { useI18n } from '@/lib/i18n';
@@ -51,7 +51,7 @@ export function LocationField({
     setLocating(false);
     if (result.kind === 'denied') setMessage(t('map.locationDenied'));
     else if (result.kind === 'unavailable') setMessage(t('map.locationUnavailable'));
-    else if (!isWithinBBox(result.position, KABYLIE_REGION.bbox))
+    else if (!isWithinBBox(result.position, DEFAULT_REGION.bbox))
       setMessage(t('report.outsideCoverage'));
     else set(result.position, 'gps');
   };

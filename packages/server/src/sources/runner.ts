@@ -37,9 +37,27 @@ export function circuitOpenUntil(consecutiveFailures: number, now: Date): Date |
   return new Date(now.getTime() + minutes * 60_000);
 }
 
+/** Points de prévision : les deux communes les plus peuplées de chaque wilaya (tout le pays). */
 async function forecastPoints(service: ServiceClient) {
-  const { data } = await service.rpc('commune_points', { p_limit: 40 });
+  const { data } = await service.rpc('wilaya_forecast_points', { p_per_wilaya: 2 });
   return (data ?? []).map((r) => ({ id: r.code, name: r.name_fr, lat: r.lat, lng: r.lng }));
+}
+
+/** Distance maximale (km) entre un épicentre et le territoire couvert pour publier un événement. */
+export const EARTHQUAKE_EVENT_MAX_DISTANCE_KM = 50;
+
+/** Vrai si le point est dans le territoire couvert ou à moins de `maxKm` (mer, frontières). */
+async function isNearCoverage(
+  service: ServiceClient,
+  o: NormalizedObservation,
+  maxKm: number,
+): Promise<boolean> {
+  const { data, error } = await service.rpc('coverage_distance_km', {
+    p_lat: o.lat,
+    p_lng: o.lng,
+  });
+  if (error) throw new Error(`coverage_distance_km: ${error.message}`);
+  return typeof data === 'number' && data <= maxKm;
 }
 
 async function upsertObservations(
@@ -70,11 +88,16 @@ async function upsertObservations(
   return count;
 }
 
-/** Séismes au-dessus du seuil : événement public « confirmé » (source sismologique), mis à jour si révisé. */
+/**
+ * Séismes au-dessus du seuil : événement public « confirmé » (source sismologique), mis à jour
+ * si révisé. L'emprise interrogée déborde sur les pays voisins : seuls les épicentres en Algérie
+ * ou à moins de `maxDistanceKm` deviennent des événements (les autres restent des observations).
+ */
 async function upsertEarthquakeEvents(
   service: ServiceClient,
   observations: NormalizedObservation[],
   minMagnitude: number,
+  maxDistanceKm: number,
 ): Promise<number> {
   let created = 0;
   for (const o of observations) {
@@ -86,6 +109,7 @@ async function upsertEarthquakeEvents(
       .eq('external_source_id', o.sourceId)
       .eq('external_ref', o.externalId)
       .maybeSingle();
+    if (!existing && !(await isNearCoverage(service, o, maxDistanceKm))) continue;
     const values = {
       location: toPoint(o.lng, o.lat),
       magnitude: o.magnitude ?? null,
@@ -238,6 +262,7 @@ export async function runSourceSync(
         service,
         observations,
         Number(config.eventMinMagnitude ?? 3),
+        Number(config.eventMaxDistanceKm ?? EARTHQUAKE_EVENT_MAX_DISTANCE_KM),
       );
     }
     if (sourceId === 'nasa_firms') await correlateHotspots(service, observations);
